@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block body_attribs %}
+onload="onStart()"
+{% endblock %}
+
+{% block app_content %}
+<h2>Dashboard</h2>
+<div class="row" style="visibility:hidden">
+    {% if current_user.adjudicator_id is none %}
+    {% with url=url_for('admin.index'), title="Database", text="Database access, just in case.", image='admin.png' %}
+        {% include '_dashboard_page.html' %}
+    {% endwith %}
+    {% with url=url_for('adjudication_system.event'), title="Tournament Office", text="Manage the tournament from here.", image='medal.png' %}
+        {% include '_dashboard_page.html' %}
+    {% endwith %}
+    {% with url=url_for('main.switch_page'), title="Switch to Adjudicator account", text="Adjudicators", image='change_user.png' %}
+        {% include '_dashboard_page.html' %}
+    {% endwith %}
+    {% else %}
+    {% for competition in current_user.adjudicator.competitions %}
+        {% if competition.rounds|length > 0 %}
+            {% if competition.last_round().is_active %}
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <a class="btn btn-primary mb-3" href="{{url_for('adjudication_system.adjudicate_start_page', round_id=competition.last_round().round_id)}}">{{competition}}</a>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+        <h5>Today you are assigned to:</h5>
+        <ul>
+        {% for competition in current_user.adjudicator.competitions %}
+            <li>{{competition}}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function onStart() {
+    var maxHeight = 0;
+    $(".thumbnail-same-height").each(function(){
+       if ($(this).height() > maxHeight) { maxHeight = $(this).height(); }
+    });
+    $(".thumbnail-same-height").height(maxHeight);
+    $(".row").css('visibility', 'visible');
+}
+</script>
+{% endblock %}
