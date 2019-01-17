@@ -86,6 +86,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True)
     is_active = db.Column(db.Boolean, nullable=False, default=False)
     password_hash = db.Column(db.String(128))
+    access = db.Column(db.Integer, index=True, nullable=False)
     adjudicator_id = db.Column(db.Integer, db.ForeignKey('adjudicator.adjudicator_id'))
     adjudicator = db.relationship('Adjudicator', backref=db.backref("user", uselist=False), single_parent=True,
                                   cascade='all, delete-orphan')
@@ -103,7 +104,13 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def is_tournament_office_manager(self):
-        return self.adjudicator is None
+        return self.access == ACCESS[TOURNAMENT_OFFICE_MANAGER]
+
+    def is_floor_manager(self):
+        return self.access == ACCESS[FLOOR_MANAGER]
+
+    def is_adjudicator(self):
+        return self.access == ACCESS[ADJUDICATOR]
 
 
 class Event(db.Model):

@@ -7,7 +7,7 @@ from adjudication_system.adjudication_system.forms import SplitForm, EventForm, 
     PrintReportsForm, CoupleForm, EditCoupleForm, EditDancerForm, CreateAdjudicatorForm, DancerForm, ImportDancersForm
 from adjudication_system.models import User, Event, Competition, DancingClass, Discipline, Dance, Round, \
     RoundType, Adjudicator, Couple, CouplePresent, RoundResult, DanceActive, Dancer, CompetitionMode, \
-    create_couples_list, ADJUDICATOR_SYSTEM_TABLES
+    create_couples_list, ADJUDICATOR_SYSTEM_TABLES, requires_access_level
 from itertools import combinations
 from adjudication_system.values import *
 from datetime import datetime, timedelta
@@ -109,6 +109,7 @@ def create_base():
 
 @bp.route('/event', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def event():
     event_form = EventForm()
     competition_form = CompetitionForm()
@@ -223,6 +224,7 @@ def create_default_competition(disc, d_class, start_time):
 
 @bp.route('/dances', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def dances():
     dance_form = DanceForm()
     if dance_form.dance_submit.name in request.form:
@@ -247,6 +249,7 @@ def dances():
 
 @bp.route('/edit_dance/<int:dance_id>', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def edit_dance(dance_id):
     dance = Dance.query.filter(Dance.dance_id == dance_id).first()
     if dance is not None:
@@ -285,6 +288,7 @@ def edit_dance(dance_id):
 
 @bp.route('/disciplines', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def disciplines():
     discipline_form = DisciplineForm()
     if discipline_form.discipline_submit.name in request.form:
@@ -308,6 +312,7 @@ def disciplines():
 
 @bp.route('/edit_discipline/<int:discipline_id>', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def edit_discipline(discipline_id):
     discipline = Discipline.query.filter(Discipline.discipline_id == discipline_id).first()
     if discipline is not None:
@@ -343,6 +348,7 @@ def edit_discipline(discipline_id):
 
 @bp.route('/dancing_classes', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def dancing_classes():
     dancing_class_form = DancingClassForm()
     if dancing_class_form.dancing_class_submit.name in request.form:
@@ -365,6 +371,7 @@ def dancing_classes():
 
 @bp.route('/edit_dancing_class/<int:dancing_class_id>', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def edit_dancing_class(dancing_class_id):
     dancing_class = DancingClass.query.filter(DancingClass.dancing_class_id == dancing_class_id).first()
     if dancing_class is not None:
@@ -401,6 +408,7 @@ def edit_dancing_class(dancing_class_id):
 
 @bp.route('/available_adjudicators', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def available_adjudicators():
     all_adjudicators = Adjudicator.query.order_by(Adjudicator.name).all()
     form = CreateAdjudicatorForm()
@@ -441,6 +449,7 @@ def generate_tag(tag):
 
 @bp.route('/delete_adjudicator/<int:adjudicator_id>', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def delete_adjudicator(adjudicator_id):
     adjudicator = Adjudicator.query.filter(Adjudicator.adjudicator_id == adjudicator_id).first()
     if adjudicator is not None:
@@ -454,6 +463,7 @@ def delete_adjudicator(adjudicator_id):
 
 @bp.route('/adjudicator_assignments', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def adjudicator_assignments():
     if g.event is not None:
         all_adjudicators = Adjudicator.query.all()
@@ -476,6 +486,7 @@ def adjudicator_assignments():
 
 @bp.route('/available_dancers', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def available_dancers():
     form = DancerForm()
     import_form = ImportDancersForm()
@@ -536,6 +547,7 @@ def available_dancers():
 
 @bp.route('/edit_dancer/<int:dancer_id>', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def edit_dancer(dancer_id):
     dancer = Dancer.query.filter(Dancer.dancer_id == dancer_id).first()
     if dancer is not None:
@@ -563,6 +575,7 @@ def edit_dancer(dancer_id):
 
 @bp.route('/available_couples', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def available_couples():
     form = CoupleForm()
     if request.method == POST:
@@ -591,6 +604,7 @@ def available_couples():
 
 @bp.route('/edit_couple/<int:couple_id>', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def edit_couple(couple_id):
     couple = Couple.query.filter(Couple.couple_id == couple_id).first()
     if couple is not None:
@@ -610,6 +624,7 @@ def edit_couple(couple_id):
 
 @bp.route('/delete_couple/<int:couple_id>', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def delete_couple(couple_id):
     couple = Couple.query.filter(Couple.couple_id == couple_id).first()
     if couple is not None:
@@ -626,6 +641,7 @@ def delete_couple(couple_id):
 
 @bp.route('/competition', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def competition():
     competition_id = request.args.get('competition_id', type=int)
     comp = Competition.query.filter(Competition.competition_id == competition_id).first()
@@ -677,6 +693,7 @@ def competition():
 
 @bp.route('/progress', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def progress():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -814,6 +831,7 @@ def split_list(l, indices):
 
 @bp.route('/split', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def split():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -834,6 +852,7 @@ def split():
 
 @bp.route('/reports', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def reports():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -848,6 +867,7 @@ def reports():
 
 @bp.route('/reports_print', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def reports_print():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -859,6 +879,7 @@ def reports_print():
 
 @bp.route('/floor_management', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def floor_management():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -898,6 +919,7 @@ def floor_management():
 
 @bp.route('/adjudication', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def adjudication():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -1006,6 +1028,7 @@ def adjudication():
 
 @bp.route('/final_result', methods=['GET'])
 @login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def final_result():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -1017,6 +1040,7 @@ def final_result():
 
 @bp.route('/adjudicator_dashboard', methods=['GET'])
 @login_required
+@requires_access_level([ACCESS[ADJUDICATOR]])
 def adjudicator_dashboard():
     current_user.adjudicator.round = 0
     current_user.adjudicator.dance = 0
@@ -1026,6 +1050,7 @@ def adjudicator_dashboard():
 
 @bp.route('/adjudicate_start_page', methods=['GET'])
 @login_required
+@requires_access_level([ACCESS[ADJUDICATOR]])
 def adjudicate_start_page():
     current_user.adjudicator.round = 0
     current_user.adjudicator.dance = 0
@@ -1042,6 +1067,7 @@ def adjudicate_start_page():
 
 @bp.route('/adjudicate', methods=['GET'])
 @login_required
+@requires_access_level([ACCESS[ADJUDICATOR]])
 def adjudicate():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
@@ -1063,12 +1089,14 @@ def adjudicate():
 
 @bp.route('/floor_manager_start_page', methods=['GET'])
 @login_required
+@requires_access_level([ACCESS[FLOOR_MANAGER]])
 def floor_manager_start_page():
     return render_template('adjudication_system/floor_manager_start_page.html')
 
 
 @bp.route('/floor_manager', methods=['GET', 'POST'])
 @login_required
+@requires_access_level([ACCESS[FLOOR_MANAGER]])
 def floor_manager():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()

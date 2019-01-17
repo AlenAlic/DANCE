@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager, current_user, AnonymousUserMixin
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_bootstrap import Bootstrap
@@ -15,10 +15,7 @@ class MyAdminIndexView(AdminIndexView):
         if not current_user.is_authenticated:
             return redirect(url_for('main.index'))
         else:
-            if current_user.is_authenticated:
-                return self.render(self._template)
-            else:
-                return redirect(url_for('main.index'))
+            return self.render(self._template)
 
 
 db = SQLAlchemy()
@@ -50,6 +47,21 @@ class UserView(AdjudicatorSystemView):
     def on_model_change(self, form, User, is_created):
         if form.password2.data != '':
             User.set_password(form.password2.data)
+
+
+class Anonymous(AnonymousUserMixin):
+
+    @staticmethod
+    def is_tournament_office_manager():
+        return False
+
+    @staticmethod
+    def is_floor_manager():
+        return False
+
+    @staticmethod
+    def is_adjudicator():
+        return False
 
 
 def create_app():
@@ -86,19 +98,26 @@ def create_app():
     admin.add_view(AdjudicatorSystemView(CouplePresent, db.session))
     admin.add_view(AdjudicatorSystemView(RoundResult, db.session))
 
-    # Shell command for creating first account
-    def create_admin(password):
+    # Shell command for creating tournament office (admin) account and a floor manager account
+    def create_tournament_office(tournament_office_password, floor_manager_password):
         with app.app_context():
             user = User()
             user.username = 'admin'
-            user.set_password(password)
+            user.set_password(tournament_office_password)
             user.is_active = True
+            user.access = values.ACCESS[values.TOURNAMENT_OFFICE_MANAGER]
             db.session.add(user)
+            fm = User()
+            fm.username = 'floor'
+            fm.set_password(floor_manager_password)
+            fm.is_active = True
+            fm.access = values.ACCESS[values.FLOOR_MANAGER]
+            db.session.add(fm)
             db.session.commit()
 
     @app.shell_context_processor
     def make_shell_context():
-        return {'create_admin': create_admin}
+        return {'create_tournament_office': create_tournament_office}
 
     @app.before_request
     def before_request_callback():
