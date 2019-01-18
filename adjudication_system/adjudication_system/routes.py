@@ -421,6 +421,7 @@ def available_adjudicators():
                     u.username = form.tag.data
                     u.set_password(form.tag.data)
                     u.is_active = True
+                    u.access = ACCESS[ADJUDICATOR]
                     adj = Adjudicator()
                     adj.name = form.name.data
                     adj.tag = generate_tag(f"{form.tag.data}".upper())
