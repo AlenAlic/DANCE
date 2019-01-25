@@ -7,6 +7,7 @@ RESULT = 'Result'
 TOTAL = 'Total'
 QUALIFIED = 'Qualified'
 FIRST = 'First'
+SUM = 'Sum'
 
 
 class SkatingDance:
@@ -458,3 +459,83 @@ class CompetitionResult:
                 with suppress(ValueError):
                     self.table.loc[i, c] = int(self.table.loc[i, c])
         print('')
+
+
+def generate_placings(results, counter=1):
+    unique_results = list(set(results))
+    unique_results.sort(reverse=True)
+    result_placing = {}
+    for i in set(results):
+        result_placing.update({i: results.count(i)})
+    result_map = {}
+    for i in unique_results:
+        if result_placing[i] == 1:
+            result_map.update({i: str(counter)})
+        else:
+            result_map.update({i: str(counter) + '-' + str(counter + result_placing[i] - 1)})
+        counter += result_placing[i]
+    return result_map
+
+
+class RankingReport:
+    def __init__(self, competition):
+        super().__init__()
+        self.competition = competition
+        self.rounds = sorted([r for r in self.competition.rounds], key=lambda x: x.round_id, reverse=True)
+        if competition.is_random_single_partner():
+            self.couples = [c for c in competition.rounds[0].couples]
+        elif competition.is_single_partner():
+            self.couples = [c for c in competition.couples]
+        self.adjudicators = competition.adjudicators
+        self.placings = {}
+        self.skating_results = {}
+        self.reference_couples = {c.number: c for c in self.couples}
+        self.added_couples = []
+        for r in self.rounds:
+            if r.is_final():
+                if r not in self.skating_results:
+                    self.skating_results[r] = r.skating_summary()
+                for res in self.skating_results[r].final_result_row():
+                    if self.reference_couples[res['couple'].number] not in self.added_couples:
+                        self.placings[len(self.placings)+1] = {'couple': self.reference_couples[res['couple'].number],
+                                                               'placing': res['placing'],
+                                                               'number': res['couple'].number}
+                        self.added_couples.append(self.reference_couples[res['couple'].number])
+            else:
+                placings_map = generate_placings([res.marks for res in r.round_results if res.couple
+                                                  not in self.added_couples], counter=len(self.placings)+1)
+                for res in sorted([res for res in r.round_results], key=lambda x: x.marks, reverse=True):
+                    if self.reference_couples[res.couple.number] not in self.added_couples:
+                        self.placings[len(self.placings) + 1] = {'couple': self.reference_couples[res.couple.number],
+                                                                 'placing': placings_map[res.marks],
+                                                                 'number': res.couple.number}
+                        self.added_couples.append(self.reference_couples[res.couple.number])
+        self.results = {self.placings[c]['couple']: {r: {d: {a: None for a in r.competition.adjudicators}
+                                                         for d in r.dances} for r in self.rounds
+                                                     if self.placings[c]['couple'] in r.couples} for c in self.placings}
+        for couple in self.results:
+            for r in self.rounds:
+                if couple in r.couples:
+                    for dance in r.dances:
+                        if r.is_final():
+                            for adj in r.competition.adjudicators:
+                                self.results[couple][r][dance][adj] = \
+                                    self.skating_results[r].skating_dances[dance].skating[adj.tag][couple.number]
+                            self.results[couple][r][dance][SUM] = \
+                                self.skating_results[r].summary[dance.tag][couple.number]
+                        else:
+                            marks = r.marks(dance)
+                            for mark in marks:
+                                self.results[couple][r][dance][mark.adjudicator] = 'x' if mark.mark else '-'
+                            self.results[couple][r][dance][SUM] = \
+                                len([m for m in marks if m.couple == couple and m.mark])
+                    if r.is_final():
+                        self.results[couple][r][TOTAL] = self.skating_results[r].summary[TOTAL][couple.number]
+                    else:
+                        marks = r.marks()
+                        self.results[couple][r][TOTAL] = len([m for m in marks if m.couple == couple and m.mark])
+        self.round_count = {r: i for i, r in enumerate(sorted([r for r in self.rounds if not r.is_final() and
+                                                               not r.is_semi_final() and not r.is_re_dance()],
+                                                              key=lambda x: x.round_id), 1)}
+        self.round_count.update({r: r.short_name() for r in self.rounds if r.is_final() or
+                                 r.is_semi_final() or r.is_re_dance()})

@@ -149,3 +149,13 @@ After saving this file, reload nginx:
 ### Congratulations!
 
 The xTDS Adjudication System should be available on the local network through the local ip address of the machine you're on.
+
+### Allow external access
+If you wish to reach the site through the internet, you'll need a firewall and allow outside access to the server.
+
+We'll install ufw (the Uncomplicated Firewall), and configure to allow external traffic on port 80 (http). We'll add port 22 (ssh) so that you do not always need to be physically next to the server.
+
+    sudo apt install -y ufw
+    sudo ufw allow http
+    sudo ufw allow ssh
+    sudo ufw --force enable

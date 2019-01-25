@@ -8,7 +8,7 @@ import random
 from random import shuffle
 from adjudication_system.values import *
 import itertools
-from adjudication_system.skating import SkatingDance, SkatingSummary, CompetitionResult
+from adjudication_system.skating import SkatingDance, SkatingSummary, CompetitionResult, RankingReport
 from functools import wraps
 
 
@@ -252,6 +252,9 @@ class Competition(db.Model):
             return create_couples_list(leads=self.leads, follows=self.follows)
         elif self.mode == CompetitionMode.change_per_round or self.mode == CompetitionMode.change_per_dance:
             return create_couples_list(leads=self.leads, follows=self.follows)
+
+    def is_single_partner(self):
+        return self.mode == CompetitionMode.single_partner
 
     def is_random_single_partner(self):
         return self.mode == CompetitionMode.random_single_partner
@@ -506,6 +509,12 @@ class Couple(db.Model):
     def deletable(self):
         return len(self.rounds) == 0 and len(self.heats) == 0
 
+    def teams(self):
+        if self.lead.team == self.follow.team:
+            return self.lead.team
+        else:
+            return f"{self.lead.team} / {self.follow.team}"
+
 
 class RoundType(enum.Enum):
     qualification = "Qualification"
@@ -516,6 +525,10 @@ class RoundType(enum.Enum):
     intermediate_round = "Intermediate round"
     semi_final = "Semi-final"
     final = "Final"
+
+
+ROUND_SHORT_NAMES = {RoundType.general_look.value: 'GL', RoundType.first_round: '1st', RoundType.re_dance: 'R',
+                     RoundType.intermediate_round: 'I', RoundType.semi_final: 'SF', RoundType.final: 'F'}
 
 
 class Round(db.Model):
@@ -537,6 +550,9 @@ class Round(db.Model):
 
     def __repr__(self):
         return '{comp} {type}'.format(comp=self.competition, type=self.type.value)
+
+    def short_name(self):
+        return ROUND_SHORT_NAMES[self.type]
 
     def is_completed(self):
         if not self.is_final():
@@ -858,6 +874,9 @@ class Round(db.Model):
 
     def skating_summary(self, follows=False):
         return SkatingSummary(dancing_round=self, follows=follows)
+
+    def ranking_report(self):
+        return RankingReport(self.competition)
 
     def deactivate(self):
         for dance in self.dance_active:
