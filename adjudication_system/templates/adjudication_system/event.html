@@ -63,11 +63,13 @@
     <a role="button" class="btn btn-outline-secondary ml-2" href="{{url_for('main.dashboard')}}">Cancel</a>
 </form>
 {% endif %}
-{% if config.get('ENV') == g.data.DEBUG_ENV %}
+{% if config.get('ENV') == g.data.DEBUG_ENV or config.get(g.data.ODK) %}
 <h3 class="mt-3">Database tools</h3>
 <div role="group">
 <button class="btn btn-outline-primary" data-toggle="modal" data-target="#reset" aria-hidden="true" >Reset</button>
+{% if config.get('ENV') == g.data.DEBUG_ENV %}
 <a class="btn btn-outline-primary ml-2" href="{{url_for('adjudication_system.event')}}?populate_test">Populate with dummy couples and adjudicators</a>
+{% endif %}
 </div>
 <div align="left" class="modal fade" id="reset" tabindex="-1" role="dialog" aria-labelledby="header-reset" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
