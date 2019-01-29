@@ -101,7 +101,7 @@ class SkatingDance:
             if list(couples.values()).count(min_place_marks) == 1:
                 for c in couples:
                     if couples[c] == min_place_marks:
-                        self.skating.loc[c, col] = f"{self.skating.loc[c, col]} ({rule_7_couples[c]})"
+                        self.skating.loc[c, col] = "{s} ({m})".format(s=self.skating.loc[c, col], m=rule_7_couples[c])
                         self.skating.loc[c, RESULT] = min(placings)
                         placings.remove(min(placings))
                         del couples[c]
@@ -115,7 +115,7 @@ class SkatingDance:
                     placings = placings[len(couples):]
             elif len(couples) > 0:
                 for c in couples:
-                    self.skating.loc[c, col] = f"{self.skating.loc[c, col]} ({couples[c]})"
+                    self.skating.loc[c, col] = "{s} ({m})".format(s=self.skating.loc[c, col], m=couples[c])
                 # Rule 8
                 if col + 1 in self.placing_columns:
                     self.rule_5(col + 1, [c for c in couples], placings[:len(couples)])
