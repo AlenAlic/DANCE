@@ -210,7 +210,7 @@ class Competition(db.Model):
         return '{disc} {cls}'.format(cls=self.dancing_class, disc=self.discipline)
 
     def short_repr(self):
-        return f'{self.discipline.name[:2]}{self.dancing_class.name[:2]}'
+        return '{disc}{cls}'.format(cls=self.discipline.name[:2], disc=self.dancing_class.name[:2])
 
     def first_round(self):
         try:
@@ -450,7 +450,7 @@ class Dancer(db.Model):
     competitions_follow = db.relationship("Competition", secondary=competition_follow_table, back_populates="follows")
 
     def __repr__(self):
-        return f'{self.name}'
+        return '{}'.format(self.name)
 
     def partners(self):
         if self.role == LEAD:

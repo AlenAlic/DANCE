@@ -399,12 +399,13 @@ class CompetitionResult:
         self.table = self.table.fillna(0)
         for dancing_round in competition.rounds:
             if not dancing_round.is_general_look():
-                self.table.loc[str(dancing_round.round_id) + RESULT, FIRST] = f'Result of {dancing_round.type.value}'
+                self.table.loc[str(dancing_round.round_id) + RESULT, FIRST] = \
+                    'Result of {}'.format(dancing_round.type.value)
                 previous_round = dancing_round.previous_round()
                 if previous_round is not None:
                     if not previous_round.is_general_look():
                         self.table.loc[str(dancing_round.round_id) + QUALIFIED, FIRST] = \
-                            f'Qualified for {dancing_round.type.value}'
+                            'Qualified for {}'.format(dancing_round.type.value)
                 if not dancing_round.is_final():
                     for adj in self.adjudicators:
                         self.table.loc[str(dancing_round.round_id) + str(adj.tag), FIRST] = adj.name

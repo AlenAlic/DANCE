@@ -36,10 +36,10 @@ class EqualNumberLeadsFollows(object):
     def __call__(self, form, field):
         if form.competition.mode != CompetitionMode.single_partner:
             if len(form.competition.leads) != len(form.competition.follows):
-                raise ValidationError(field.gettext(f"Cannot create first round, there "
-                                                    f"are {len(form.competition.leads)} Leads "
-                                                    f"and {len(form.competition.follows)} Follows assigned to this"
-                                                    f" competition."))
+                raise ValidationError(field.gettext("Cannot create first round, there are {leads} Leads and {follows} "
+                                                    "Follows assigned to this competition."
+                                                    .format(leads=len(form.competition.leads),
+                                                            follows=len(form.competition.follows))))
 
 
 class UniqueDancerCompetition(object):
@@ -62,12 +62,13 @@ class UniqueCompetitionDancer(object):
         comps = Competition.query.filter(Competition.competition_id.in_(form.competitions.data)).all()
         for comp in [c for c in comps]:
             if form.dancer.number in [d.number for d in comp.dancers()]:
-                raise ValidationError(field.gettext(f"Cannot add {form.dancer} to {comp}. He/She is already dancing "
-                                                    f"there as a {OPPOSITE_ROLES[form.dancer.role]}."))
+                raise ValidationError(field.gettext("Cannot add {dancer} to {comp}. He/She is already dancing "
+                                                    "there as a {role}.".format(dancer=form.dancer, comp=comp,
+                                                                                role=OPPOSITE_ROLES[form.dancer.role])))
 
 
 class UniquePerson(object):
     """Checks if there are no double dancers in the competition."""
     def __call__(self, form, field):
         if form.lead.data.number == form.follow.data.number:
-            raise ValidationError(field.gettext(f"{form.lead.data} cannot dance with himself or herself."))
+            raise ValidationError(field.gettext("{} cannot dance with himself or herself.".format(form.lead.data)))

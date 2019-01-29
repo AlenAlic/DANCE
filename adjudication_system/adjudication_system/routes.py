@@ -122,7 +122,7 @@ def event():
             e.name = event_form.name.data
             db.session.add(e)
             db.session.commit()
-            flash(f"Created {e.name} event.")
+            flash("Created {} event.".format(e.name))
             return redirect(url_for('adjudication_system.event'))
     if competition_form.comp_submit.name in request.form:
         if competition_form.validate_on_submit():
@@ -133,7 +133,7 @@ def event():
             c.when = competition_form.when.data
             c.event = g.event
             db.session.commit()
-            flash(f"Created {c} competition.")
+            flash("Created {} competition.".format(c))
             return redirect(url_for('adjudication_system.event'))
     if default_form.default_submit.name in request.form:
         if default_form.validate_on_submit():
@@ -166,7 +166,7 @@ def event():
             if default_form.open_class.data:
                 create_default_competition(BALLROOM, OPEN_CLASS, start_time)
                 create_default_competition(LATIN, OPEN_CLASS, start_time)
-            flash(f"Created base dances, disciplines, classes, and the chosen default competitions.")
+            flash("Created base dances, disciplines, classes, and the chosen default competitions.")
             return redirect(url_for('adjudication_system.event'))
     form = request.args
     if 'reset' in form:
@@ -239,11 +239,11 @@ def dances():
                 d.tag = dance_form.tag.data
                 db.session.add(d)
                 db.session.commit()
-                flash(f"Created {d.name} as a dance.")
+                flash("Created {} as a dance.".format(d.name))
                 return redirect(url_for('adjudication_system.dances'))
             else:
-                flash(f"Cannot create {dance_form.name.data} dance, a dance with that name or tag already exists.",
-                      "alert-warning")
+                flash("Cannot create {} dance, a dance with that name or tag already exists."
+                      .format(dance_form.name.data), "alert-warning")
                 return redirect(url_for('adjudication_system.dances'))
     all_dances = Dance.query.order_by(Dance.discipline_id, Dance.name).all()
     return render_template('adjudication_system/dances.html', dance_form=dance_form, all_dances=all_dances)
@@ -267,20 +267,20 @@ def edit_dance(dance_id):
                     dance.name = dance_form.name.data
                     dance.tag = dance_form.tag.data
                     db.session.commit()
-                    flash(f"Edited {dance}.")
+                    flash("Edited {}.".format(dance))
                     return redirect(url_for('adjudication_system.dances'))
                 else:
-                    flash(f"Cannot change {dance_form.name.data} dance, a dance with that name or tag already exists.",
-                          "alert-warning")
+                    flash("Cannot change {} dance, a dance with that name or tag already exists."
+                          .format(dance_form.name.data), "alert-warning")
                     return redirect(url_for('adjudication_system.edit_dance'))
         if 'delete_dance' in request.form:
             if dance.deletable():
                 db.session.delete(dance)
                 db.session.commit()
-                flash(f"Deleted {dance}.")
+                flash("Deleted {}.".format(dance))
                 return redirect(url_for('adjudication_system.dances'))
             else:
-                flash(f"Cannot delete {dance}, it has disciplines associated with it.")
+                flash("Cannot delete {}, it has disciplines associated with it.".format(dance))
                 return redirect(url_for('adjudication_system.edit_dance'))
     else:
         flash("Invalid id.")
@@ -302,10 +302,11 @@ def disciplines():
                 d.dances = Dance.query.filter(Dance.dance_id.in_(discipline_form.dances.data)).all()
                 db.session.add(d)
                 db.session.commit()
-                flash(f"Created {d} as a discipline.")
+                flash("Created {} as a discipline.".format(d))
                 return redirect(url_for('adjudication_system.disciplines'))
             else:
-                flash(f"Cannot create {discipline_form.name.data} discipline, it already exists.", "alert-warning")
+                flash("Cannot create {} discipline, it already exists.".format(discipline_form.name.data),
+                      "alert-warning")
                 return redirect(url_for('adjudication_system.disciplines'))
     all_disciplines = Discipline.query.all()
     return render_template('adjudication_system/disciplines.html', discipline_form=discipline_form,
@@ -326,20 +327,20 @@ def edit_discipline(discipline_id):
                     discipline.name = discipline_form.name.data
                     discipline.dances = Dance.query.filter(Dance.dance_id.in_(discipline_form.dances.data)).all()
                     db.session.commit()
-                    flash(f"Edited {discipline}.")
+                    flash("Edited {}.".format(discipline))
                     return redirect(url_for('adjudication_system.disciplines'))
                 else:
-                    flash(f"Cannot change name to {discipline_form.name.data}. A discipline with that name already "
-                          f"exists.", "alert-warning")
+                    flash("Cannot change name to {}. A discipline with that name already exists."
+                          .format(discipline_form.name.data), "alert-warning")
                     return redirect(url_for('adjudication_system.edit_discipline'))
         if 'delete_discipline' in request.form:
             if discipline.deletable():
                 db.session.delete(discipline)
                 db.session.commit()
-                flash(f"Deleted {discipline}.")
+                flash("Deleted {}.".format(discipline))
                 return redirect(url_for('adjudication_system.disciplines'))
             else:
-                flash(f"Cannot delete {discipline}, it has competitions associated with it.")
+                flash("Cannot delete {}, it has competitions associated with it.".format(discipline))
                 return redirect(url_for('adjudication_system.edit_discipline'))
     else:
         flash("Invalid id.")
@@ -361,10 +362,11 @@ def dancing_classes():
                 d.name = dancing_class_form.name.data
                 db.session.add(d)
                 db.session.commit()
-                flash(f"Created {d} as a class.")
+                flash("Created {} as a class.".format(d))
                 return redirect(url_for('adjudication_system.dancing_classes'))
             else:
-                flash(f"Cannot create {dancing_class_form.name.data} class, it already exists.", "alert-warning")
+                flash("Cannot create {} class, it already exists.".format(dancing_class_form.name.data),
+                      "alert-warning")
                 return redirect(url_for('adjudication_system.dancing_classes'))
     all_classes = DancingClass.query.all()
     return render_template('adjudication_system/dancing_classes.html', dancing_class_form=dancing_class_form,
@@ -386,20 +388,20 @@ def edit_dancing_class(dancing_class_id):
                 if check is None:
                     dancing_class.name = dancing_class_form.name.data
                     db.session.commit()
-                    flash(f"Edited {dancing_class}.")
+                    flash("Edited {}.".format(dancing_class))
                     return redirect(url_for('adjudication_system.dancing_classes'))
                 else:
-                    flash(f"Cannot change name to {dancing_class_form.name.data}. A class with that name already "
-                          f"exists.", "alert-warning")
+                    flash("Cannot change name to {}. A class with that name already exists."
+                          .format(dancing_class_form.name.data), "alert-warning")
                     return redirect(url_for('adjudication_system.edit_dancing_class'))
         if 'delete_class' in request.form:
             if dancing_class.deletable():
                 db.session.delete(dancing_class)
                 db.session.commit()
-                flash(f"Deleted {dancing_class}.")
+                flash("Deleted {}.".format(dancing_class))
                 return redirect(url_for('adjudication_system.dancing_classes'))
             else:
-                flash(f"Cannot delete {dancing_class}, it has competitions associated with it.")
+                flash("Cannot delete {}, it has competitions associated with it.".format(dancing_class))
                 return redirect(url_for('adjudication_system.edit_dancing_class'))
     else:
         flash("Invalid id.")
@@ -426,14 +428,14 @@ def available_adjudicators():
                     u.access = ACCESS[ADJUDICATOR]
                     adj = Adjudicator()
                     adj.name = form.name.data
-                    adj.tag = generate_tag(f"{form.tag.data}".upper())
+                    adj.tag = generate_tag("{}".format(form.tag.data).upper())
                     adj.user = u
                     db.session.add(adj)
                     db.session.commit()
-                    flash(f"Added {form.name.data} as an adjudicator, with tag, username and password as {adj.tag}.",
-                          "alert-success")
+                    flash("Added {name} as an adjudicator, with tag, username and password as {tag}."
+                          .format(name=form.name.data, tag=adj.tag), "alert-success")
                 else:
-                    flash(f"{form.name.data} is already an adjudicator in the system.")
+                    flash("{} is already an adjudicator in the system.".format(form.name.data))
                 return redirect(url_for("adjudication_system.available_adjudicators"))
     return render_template('adjudication_system/available_adjudicators.html', all_adjudicators=all_adjudicators,
                            form=form)
@@ -446,7 +448,7 @@ def generate_tag(tag):
         if tag not in tags:
             break
         else:
-            tag = f"{original_tag}{i}"
+            tag = "{tag}{num}".format(tag=original_tag, num=i)
     return tag
 
 
@@ -456,11 +458,11 @@ def generate_tag(tag):
 def delete_adjudicator(adjudicator_id):
     adjudicator = Adjudicator.query.filter(Adjudicator.adjudicator_id == adjudicator_id).first()
     if adjudicator is not None:
-        flash(f"Deleted {adjudicator} from the system.")
+        flash("Deleted {} from the system.".format(adjudicator))
         db.session.delete(adjudicator.user)
         db.session.commit()
     else:
-        flash(f"Invalid id.", "alert-warning")
+        flash("Invalid id.", "alert-warning")
     return redirect(url_for("adjudication_system.available_adjudicators"))
 
 
@@ -475,8 +477,9 @@ def adjudicator_assignments():
             if 'save_assignments' in form:
                 for comp in g.event.competitions:
                     if comp.is_configurable():
-                        checks = [a for a in [f"{comp.competition_id}-{adj.adjudicator_id}" for adj in all_adjudicators]
-                                  if a in form]
+                        checks = [a for a in ["{comp_id}-{adj_id}".format(comp_id=comp.competition_id,
+                                                                          adj_id=adj.adjudicator_id)
+                                              for adj in all_adjudicators]  if a in form]
                         adjudicators = [int(a) for a in [a.split('-')[1] for a in checks]]
                         comp.adjudicators = Adjudicator.query.filter(Adjudicator.adjudicator_id.in_(adjudicators)).all()
                 db.session.commit()
@@ -506,10 +509,11 @@ def available_dancers():
                     dancer.team = form.team.data
                     db.session.add(dancer)
                     db.session.commit()
-                    flash(f"Created {dancer.name} ({dancer.number}) as a {dancer.role}", "alert-success")
+                    flash("Created {name} ({number}) as a {role}"
+                          .format(name=dancer.name, number=dancer.number, role=dancer.role), "alert-success")
                 else:
-                    flash(f"{check_dancer.name} ({check_dancer.number}) as a {check_dancer.role} is already "
-                          f"in the system.")
+                    flash("{name} ({number}) as a {role} is already in the system."
+                          .format(name=check_dancer.name, number=check_dancer.number, role=check_dancer.role))
                 return redirect(url_for("adjudication_system.available_dancers"))
         if import_form.import_submit.name in request.form:
             if import_form.validate_on_submit():
@@ -539,7 +543,7 @@ def available_dancers():
                             counter += 1
                 db.session.commit()
                 if counter > 0:
-                    flash(f"Imported {counter} unique dancers.", "alert-success")
+                    flash("Imported {} unique dancers.".format(counter), "alert-success")
                 else:
                     flash("No new dancers imported.")
                 return redirect(url_for("adjudication_system.available_dancers"))
@@ -560,15 +564,15 @@ def edit_dancer(dancer_id):
                 comps = Competition.query.filter(Competition.competition_id.in_(form.competitions.data)).all()
                 dancer.set_competitions(comps)
                 db.session.commit()
-                flash(f"Edited {dancer} ({dancer.role}).")
+                flash("Edited {dancer} ({role}).".format(dancer=dancer, role=dancer.role))
                 return redirect(url_for('adjudication_system.available_dancers'))
         if 'delete_dancer' in request.form:
             if dancer.deletable():
-                flash(f"Deleted {dancer} ({dancer.role}).")
+                flash("Deleted {dancer} ({role}).".format(dancer=dancer, role=dancer.role))
                 db.session.delete(dancer)
                 db.session.commit()
             else:
-                flash(f"Cannot delete {dancer} ({dancer.role}).")
+                flash("Cannot delete {dancer} ({role}).".format(dancer=dancer, role=dancer.role))
             return redirect(url_for('adjudication_system.available_dancers'))
     else:
         flash("Invalid id.")
@@ -595,11 +599,12 @@ def available_couples():
                         .filter(Competition.competition_id.in_(form.competitions.data)).all()
                     db.session.add(couple)
                     db.session.commit()
-                    flash(f"Created couple with {form.lead.data} as lead and {form.follow.data} as follow in the "
-                          f"following competitions: {', '.join([c.__repr__() for c in couple.competitions])}.",
-                          "alert-success")
+                    flash("Created couple with {lead} as lead and {follow} as follow in the competitions: {comps}."
+                          .format(lead=form.lead.data, follow=form.follow.data,
+                                  comps=', '.join([c.__repr__() for c in couple.competitions])), "alert-success")
                 else:
-                    flash(f"{form.lead.data} and {form.follow.data} are already a couple.")
+                    flash("{lead} and {follow} are already a couple."
+                          .format(lead=form.lead.data, follow=form.follow.data))
                 return redirect(url_for("adjudication_system.available_couples"))
     couples = Couple.query.all()
     return render_template('adjudication_system/available_couples.html', form=form, couples=couples)
@@ -617,7 +622,7 @@ def edit_couple(couple_id):
                 couple.competitions = Competition.query\
                     .filter(Competition.competition_id.in_(form.competitions.data)).all()
                 db.session.commit()
-                flash(f"Couple data {couple.lead}, {couple.follow} updated.")
+                flash("Couple data {lead}, {follow} updated.".format(lead=couple.lead, follow=couple.follow))
                 return redirect(url_for('adjudication_system.available_couples'))
     else:
         flash("Invalid id.")
@@ -632,13 +637,14 @@ def delete_couple(couple_id):
     couple = Couple.query.filter(Couple.couple_id == couple_id).first()
     if couple is not None:
         if couple.deletable():
-            flash(f"Deleted {couple.lead} and {couple.follow} as a couple from the system.")
+            flash("Deleted {lead} and {follow} as a couple from the system."
+                  .format(lead=couple.lead, follow=couple.follow))
             db.session.delete(couple)
             db.session.commit()
         else:
             flash("Cannot delete couple.")
     else:
-        flash(f"Invalid id.", "alert-warning")
+        flash("Invalid id.", "alert-warning")
     return redirect(url_for("adjudication_system.available_couples"))
 
 
@@ -669,7 +675,7 @@ def competition():
             comp.leads = Dancer.query.filter(Dancer.dancer_id.in_(competition_form.competition_leads.data)).all()
             comp.follows = Dancer.query.filter(Dancer.dancer_id.in_(competition_form.competition_follows.data)).all()
             db.session.commit()
-            flash(f"Changes to {comp} saved.", "alert-success")
+            flash("Changes to {} saved.".format(comp), "alert-success")
             return redirect(url_for("adjudication_system.competition", competition_id=comp.competition_id))
     if round_form.round_submit.name in request.form:
         if round_form.validate_on_submit():
@@ -688,7 +694,7 @@ def competition():
             r.couples = comp.generate_couples()
             r.create_heats(round_form.heats.data)
             db.session.commit()
-            flash(f"Created {r.type.value} for {comp}.", "alert-success")
+            flash("Created {type} for {comp}.".format(type=r.type.value, comp=comp), "alert-success")
             return redirect(url_for("adjudication_system.progress", round_id=r.round_id))
     return render_template('adjudication_system/competition.html', competition=comp, competition_form=competition_form,
                            round_form=round_form)
@@ -703,7 +709,7 @@ def progress():
     if dancing_round is None:
         return redirect(url_for("adjudication_system.event"))
     if not dancing_round.has_adjudicators():
-        flash(f"Please assign adjudicators first.", "alert-warning")
+        flash("Please assign adjudicators first.", "alert-warning")
         return redirect(url_for("adjudication_system.competition",
                                 competition_id=dancing_round.competition.competition_id))
     if dancing_round.first_round_after_qualification_split():
@@ -730,7 +736,8 @@ def progress():
                     dancing_round.couples = couples
                     dancing_round.create_heats(round_form.heats.data)
                     db.session.commit()
-                    flash(f"Configured {dancing_round.type.value} for {dancing_round.competition}.", "alert-success")
+                    flash("Configured {type} for {comp}."
+                          .format(type=dancing_round.type.value, comp=dancing_round.competition), "alert-success")
                     return redirect(url_for("adjudication_system.progress", round_id=dancing_round.round_id))
                 if dancing_round.competition.is_change_per_dance():
                     dancers = dancing_round.change_per_dance_dancers_rows()
@@ -744,8 +751,8 @@ def progress():
                     if len(leads) == len(follows):
                         couples = create_couples_list(leads=leads, follows=follows)
                     else:
-                        flash(f"Cannot configure the next round {len(leads)} leads and {len(follows)} follows. "
-                              f"Please check the list again.", "alert-warning")
+                        flash("Cannot configure the next round with {leads} leads and {follows} follows. Please check "
+                              "the list again.".format(leads=len(leads), follows=len(follows)), "alert-warning")
                         return render_template('adjudication_system/progress.html', dancing_round=dancing_round,
                                                round_form=round_form)
                 else:
@@ -779,11 +786,12 @@ def progress():
                 else:
                     r.create_heats(round_form.heats.data)
                 db.session.commit()
-                flash(f"Created {r.type.value} for {dancing_round.competition}.", "alert-success")
+                flash("Created {type} for {competition}."
+                      .format(type=r.type.value, competition=dancing_round.competition), "alert-success")
                 return redirect(url_for("adjudication_system.progress", round_id=r.round_id))
         if "delete" in request.form:
             comp = dancing_round.competition
-            flash(f"Deleted {dancing_round}.")
+            flash("Deleted {}.".format(dancing_round))
             db.session.delete(dancing_round)
             db.session.commit()
             try:
@@ -848,7 +856,7 @@ def split():
     form = SplitForm(split_couples_into_competitions(dancing_round))
     if form.validate_on_submit():
         split_breitensport(dancing_round, split_couples_into_competitions(dancing_round)[form.scenarios.data])
-        flash(f"{dancing_round} split!", "alert-success")
+        flash("{} split!".format(dancing_round), "alert-success")
         return redirect(url_for("adjudication_system.progress", round_id=dancing_round.round_id))
     return render_template('adjudication_system/split.html', dancing_round=dancing_round, form=form)
 
@@ -984,8 +992,8 @@ def adjudication():
                     return redirect(url_for("adjudication_system.progress",
                                             round_id=request.args.get('round_id', type=int)))
                 else:
-                    flash(Markup(f"Cannot evaluate round.<br/><br/>{'<br/>'.join(dancing_round.evaluation_errors())}"),
-                          "alert-danger")
+                    flash(Markup("Cannot evaluate round.<br/><br/>{}"
+                                 .format('<br/>'.join(dancing_round.evaluation_errors()))), "alert-danger")
             else:
                 if dancing_round.is_completed():
                     flash('Final evaluated.', 'alert-success')
@@ -996,7 +1004,7 @@ def adjudication():
                 for mark in dancing_round.marks(dance):
                     mark.mark = str(mark.mark_id) in request.form
                 db.session.commit()
-                flash(f'Placings for {dancing_round} - {dance} saved.')
+                flash('Placings for {dancing_round} - {dance} saved.'.format(dancing_round=dancing_round, dance=dance))
             else:
                 flash('Cannot change marks when a dance is being adjudicated.', 'alert-warning')
             return redirect(url_for("adjudication_system.adjudication", round_id=request.args.get('round_id', type=int),
@@ -1009,7 +1017,7 @@ def adjudication():
                     except ValueError:
                         placing.final_placing = 0
                 db.session.commit()
-                flash(f'Placings for {dancing_round} - {dance} saved.')
+                flash('Placings for {dancing_round} - {dance} saved.'.format(dancing_round=dancing_round, dance=dance))
             else:
                 flash('Cannot change marks when a dance is being adjudicated.', 'alert-warning')
             return redirect(url_for("adjudication_system.adjudication", round_id=request.args.get('round_id', type=int),
@@ -1051,7 +1059,7 @@ def adjudicate_start_page():
     if dancing_round is None:
         return redirect(url_for("main.dashboard"))
     if not dancing_round.is_active:
-        flash(f"{dancing_round.competition} is currently closed.")
+        flash("{} is currently closed.".format(dancing_round.competition))
         return redirect(url_for("main.dashboard"))
     return render_template('adjudication_system/adjudicate_start_page.html', dancing_round=dancing_round)
 
@@ -1065,7 +1073,7 @@ def adjudicate():
     if dancing_round is None:
         return redirect(url_for("main.dashboard"))
     if not dancing_round.is_active:
-        flash(f"{dancing_round.competition} is currently closed.")
+        flash("{} is currently closed.".format(dancing_round.competition))
         return redirect(url_for("main.dashboard"))
     dance_id = request.args.get('dance_id', 0, type=int)
     if dance_id == 0:
