@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, g, Markup
+from flask import render_template, redirect, url_for, flash, request, g, Markup, current_app
 from flask_login import login_required, current_user
 from adjudication_system import db
 from adjudication_system.adjudication_system import bp
@@ -75,30 +75,51 @@ def create_dances():
         dance.tag = d["tag"]
         db.session.add(dance)
         db.session.commit()
+    if current_app.config.get(ODK):
+        for d in BONUS_DANCES:
+            dance = Dance()
+            dance.name = d["name"]
+            dance.tag = d["tag"]
+            db.session.add(dance)
+            db.session.commit()
 
 
 def create_dancing_classes():
     DancingClass.query.delete()
     db.session.commit()
-    for dc in DANCING_CLASSES:
-        dancing_class = DancingClass()
-        dancing_class.name = dc
-        db.session.add(dancing_class)
-        db.session.commit()
+    if not current_app.config.get(ODK):
+        for dc in DANCING_CLASSES:
+            dancing_class = DancingClass()
+            dancing_class.name = dc
+            db.session.add(dancing_class)
+            db.session.commit()
+    else:
+        for dc in ODK_CLASSES:
+            dancing_class = DancingClass()
+            dancing_class.name = dc
+            db.session.add(dancing_class)
+            db.session.commit()
 
 
 def create_disciplines():
     Discipline.query.delete()
     db.session.commit()
-    for d in ALL_COMPETITIONS:
-        discipline = Discipline()
-        discipline.name = d
-        db.session.add(discipline)
-        db.session.commit()
-    ballroom = Discipline.query.filter(Discipline.name == BALLROOM).first()
-    ballroom.dances.extend(Dance.query.filter(Dance.name.in_(BALLROOM_DANCES)).all())
-    latin = Discipline.query.filter(Discipline.name == LATIN).first()
-    latin.dances.extend(Dance.query.filter(Dance.name.in_(LATIN_DANCES)).all())
+    if not current_app.config.get(ODK):
+        for d in ALL_COMPETITIONS:
+            discipline = Discipline()
+            discipline.name = d
+            db.session.add(discipline)
+            db.session.commit()
+        ballroom = Discipline.query.filter(Discipline.name == BALLROOM).first()
+        ballroom.dances.extend(Dance.query.filter(Dance.name.in_(BALLROOM_DANCES)).all())
+        latin = Discipline.query.filter(Discipline.name == LATIN).first()
+        latin.dances.extend(Dance.query.filter(Dance.name.in_(LATIN_DANCES)).all())
+    else:
+        for d in DANCES + BONUS_DANCES:
+            db.session.add(Discipline(name=d['name']))
+            db.session.commit()
+            bonus = Discipline.query.filter(Discipline.name == d['name']).first()
+            bonus.dances.append(Dance.query.filter(Dance.name == d['name']).first())
     db.session.commit()
 
 
@@ -140,32 +161,35 @@ def event():
             create_base()
             start_time = datetime(default_form.when.data.year, default_form.when.data.month,
                                   default_form.when.data.day, 9, 0, 0)
-            create_default_competition(BALLROOM, TEST, start_time)
-            if default_form.beginners.data:
-                create_default_competition(BALLROOM, BEGINNERS, start_time)
-                create_default_competition(LATIN, BEGINNERS, start_time)
-            if default_form.amateurs.data or default_form.professionals.data or \
-                    default_form.masters.data or default_form.champions.data:
-                create_default_competition(BALLROOM, BREITENSPORT_QUALIFICATION, start_time)
-                create_default_competition(LATIN, BREITENSPORT_QUALIFICATION, start_time)
-            if default_form.amateurs.data:
-                create_default_competition(BALLROOM, AMATEURS, start_time)
-                create_default_competition(LATIN, AMATEURS, start_time)
-            if default_form.professionals.data:
-                create_default_competition(BALLROOM, PROFESSIONALS, start_time)
-                create_default_competition(LATIN, PROFESSIONALS, start_time)
-            if default_form.masters.data:
-                create_default_competition(BALLROOM, MASTERS, start_time)
-                create_default_competition(LATIN, MASTERS, start_time)
-            if default_form.champions.data:
-                create_default_competition(BALLROOM, CHAMPIONS, start_time)
-                create_default_competition(LATIN, CHAMPIONS, start_time)
-            if default_form.closed.data:
-                create_default_competition(BALLROOM, CLOSED, start_time)
-                create_default_competition(LATIN, CLOSED, start_time)
-            if default_form.open_class.data:
-                create_default_competition(BALLROOM, OPEN_CLASS, start_time)
-                create_default_competition(LATIN, OPEN_CLASS, start_time)
+            if not current_app.config.get(ODK):
+                create_default_competition(BALLROOM, TEST, start_time)
+                if default_form.beginners.data:
+                    create_default_competition(BALLROOM, BEGINNERS, start_time)
+                    create_default_competition(LATIN, BEGINNERS, start_time)
+                if default_form.amateurs.data or default_form.professionals.data or \
+                        default_form.masters.data or default_form.champions.data:
+                    create_default_competition(BALLROOM, BREITENSPORT_QUALIFICATION, start_time)
+                    create_default_competition(LATIN, BREITENSPORT_QUALIFICATION, start_time)
+                if default_form.amateurs.data:
+                    create_default_competition(BALLROOM, AMATEURS, start_time)
+                    create_default_competition(LATIN, AMATEURS, start_time)
+                if default_form.professionals.data:
+                    create_default_competition(BALLROOM, PROFESSIONALS, start_time)
+                    create_default_competition(LATIN, PROFESSIONALS, start_time)
+                if default_form.masters.data:
+                    create_default_competition(BALLROOM, MASTERS, start_time)
+                    create_default_competition(LATIN, MASTERS, start_time)
+                if default_form.champions.data:
+                    create_default_competition(BALLROOM, CHAMPIONS, start_time)
+                    create_default_competition(LATIN, CHAMPIONS, start_time)
+                if default_form.closed.data:
+                    create_default_competition(BALLROOM, CLOSED, start_time)
+                    create_default_competition(LATIN, CLOSED, start_time)
+                if default_form.open_class.data:
+                    create_default_competition(BALLROOM, OPEN_CLASS, start_time)
+                    create_default_competition(LATIN, OPEN_CLASS, start_time)
+            else:
+                generate_odk_competitions(start_time)
             flash("Created base dances, disciplines, classes, and the chosen default competitions.")
             return redirect(url_for('adjudication_system.event'))
     form = request.args
@@ -216,6 +240,59 @@ def create_default_competition(disc, d_class, start_time):
     if d_class == OPEN_CLASS:
         time = time + timedelta(hours=7)
     c.floors = floors
+    c.when = time
+    c.event = g.event
+    if d_class in BREITENSPORT_COMPETITIONS:
+        c.qualification = Competition.query.join(DancingClass, Discipline)\
+            .filter(DancingClass.name == BREITENSPORT_QUALIFICATION, Discipline.name == disc).first()
+    db.session.commit()
+
+
+def generate_odk_competitions(time):
+    create_odk_competition(SLOW_WALTZ, TEST, time)
+    for d in DANCES + BONUS_DANCES:
+        if d['name'] in BALLROOM_DANCES or d['name'] in LATIN_DANCES:
+            create_odk_competition(d['name'], BREITENSPORT_QUALIFICATION, time)
+            create_odk_competition(d['name'], AMATEURS, time)
+            create_odk_competition(d['name'], CHAMPIONS, time)
+            create_odk_competition(d['name'], OPEN_CLASS, time)
+        else:
+            create_odk_competition(d['name'], BONUS, time)
+
+
+def create_odk_competition(disc, d_class, start_time):
+    if disc in BALLROOM_DANCES:
+        pass
+    elif disc in LATIN_DANCES:
+        start_time = start_time + timedelta(days=1)
+    else:
+        start_time = start_time + timedelta(days=2)
+    time = start_time
+    c = Competition()
+    c.discipline = Discipline.query.filter(Discipline.name == disc).first()
+    c.dancing_class = DancingClass.query.filter(DancingClass.name == d_class).first()
+    c.mode = CompetitionMode.single_partner
+    if disc == SLOW_WALTZ or disc == SAMBA or disc == SALSA:
+        time = time + timedelta(hours=1)
+    if disc == TANGO or disc == CHA_CHA_CHA or disc == BACHATA:
+        time = time + timedelta(hours=2)
+    if disc == VIENNESE_WALTZ or disc == RUMBA or disc == MERENGUE:
+        time = time + timedelta(hours=3)
+    if disc == SLOW_FOXTROT or disc == PASO_DOBLE or disc == POLKA:
+        time = time + timedelta(hours=4)
+    if d_class == TEST:
+        time = time + timedelta(hours=-1)
+    if d_class == BREITENSPORT_QUALIFICATION:
+        time = time + timedelta(minutes=0)
+    if d_class == BREITENSPORT_QUALIFICATION:
+        time = time + timedelta(minutes=0)
+    if d_class == AMATEURS:
+        time = time + timedelta(minutes=10)
+    if d_class == CHAMPIONS:
+        time = time + timedelta(minutes=20)
+    if d_class == OPEN_CLASS:
+        time = time + timedelta(hours=6)
+    c.floors = 1
     c.when = time
     c.event = g.event
     if d_class in BREITENSPORT_COMPETITIONS:
@@ -479,7 +556,7 @@ def adjudicator_assignments():
                     if comp.is_configurable():
                         checks = [a for a in ["{comp_id}-{adj_id}".format(comp_id=comp.competition_id,
                                                                           adj_id=adj.adjudicator_id)
-                                              for adj in all_adjudicators]  if a in form]
+                                              for adj in all_adjudicators] if a in form]
                         adjudicators = [int(a) for a in [a.split('-')[1] for a in checks]]
                         comp.adjudicators = Adjudicator.query.filter(Adjudicator.adjudicator_id.in_(adjudicators)).all()
                 db.session.commit()

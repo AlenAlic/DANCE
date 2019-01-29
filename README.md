@@ -25,7 +25,7 @@ First, we will need install a few base dependencies:
 
 **Raspbian**
 
-    sudo apt -y install python3 python3-venv python3-dev mariadb-server supervisor nginx git
+    sudo apt -y install python3 python3-venv python3-dev mariadb-server supervisor nginx git libatlas-base-dev
 
 ### Installing the application
 Install the application through git:
