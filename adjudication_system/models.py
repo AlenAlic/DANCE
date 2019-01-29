@@ -294,15 +294,17 @@ class Competition(db.Model):
     def competitors(self, numbers_only=False):
         if not numbers_only:
             if self.mode == CompetitionMode.single_partner:
-                return f"{len(self.couples)} couple{'' if len(self.couples) == 1 else 's'}"
+                return "{couples} couple{plural}"\
+                    .format(couples=len(self.couples), plural='' if len(self.couples) == 1 else 's')
             else:
-                return f"{len(self.leads)} lead{'' if len(self.leads) == 1 else 's'} / {len(self.follows)} " \
-                    f"follow{'' if len(self.follows) == 1 else 's'}"
+                return "{leads} lead{leads_plural} / {follows} follow{follows_plural}"\
+                    .format(leads=len(self.leads),  leads_plural='' if len(self.leads) == 1 else 's',
+                            follows=len(self.follows), follows_plural='' if len(self.follows) == 1 else 's')
         else:
             if self.mode == CompetitionMode.single_partner:
-                return f"{len(self.couples)}"
+                return "{}".format(len(self.couples))
             else:
-                return f"{len(self.leads)}/{len(self.follows)}"
+                return "{leads}/{follows}".format(leads=len(self.leads), follows=len(self.follows))
 
     def dancers(self):
         return [d for d in self.leads + self.follows]
@@ -520,7 +522,7 @@ class Couple(db.Model):
         if self.lead.team == self.follow.team:
             return self.lead.team
         else:
-            return f"{self.lead.team} / {self.follow.team}"
+            return "{lead} / {follow}".format(lead=self.lead.team, follow=self.follow.team)
 
 
 class RoundType(enum.Enum):
@@ -782,7 +784,7 @@ class Round(db.Model):
         round_result_list.sort()
         unique_results = list(set(round_result_list))
         unique_results.sort(reverse=True)
-        return [(-1, f"all couples")] + [(r, f"{r} marks") for r in unique_results]
+        return [(-1, "all couples")] + [(r, "{} marks".format(r)) for r in unique_results]
 
     def change_per_dance_dancers_rows(self):
         round_result_list = [r for r in self.marks()]
@@ -827,7 +829,7 @@ class Round(db.Model):
             dancers = [d for d in dancers_list if d['crosses'] >= r]
             if len([d for d in dancers if d['lead']]) == len([d for d in dancers if d['follow']]):
                 viable_unique_results.append(r)
-        return [(-1, f"all couples")] + [(r, f"{r} marks") for r in viable_unique_results]
+        return [(-1, "all couples")] + [(r, "{} marks".format(r)) for r in viable_unique_results]
 
     def adjudicator_dance_marks(self, adjudicator, dance):
         marks = list(itertools.chain.from_iterable([h.marks for h in self.heats if h.dance == dance]))
@@ -993,7 +995,8 @@ class Round(db.Model):
             for dance in self.dances:
                 marks = [m.mark for m in self.adjudicator_marks(adjudicator, dance)]
                 if True not in marks:
-                    errors_list.append(f"{adjudicator} has zero marks in {dance}. This is probably an error.")
+                    errors_list.append("{adjudicator} has zero marks in {dance}. This is probably an error."
+                                       .format(adjudicator=adjudicator, dance=dance))
         return errors_list
 
 

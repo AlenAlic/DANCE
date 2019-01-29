@@ -2,19 +2,30 @@
 
 A standalone version of the adjudication system that is integrated with the xTDS WebPortal.
 
-## Installation (on Ubuntu)
-This will assume a fresh installation of Ubuntu 18.04.
+## Installation (Ubuntu or Raspbian)
+This will assume a fresh installation of Ubuntu 18.04. The installation on Raspbian is similar.
+
+Commands that are both systems, unless stated otherwise.
 
 Before we start installing the system, start with the following commands to update te system:
 
-    sudo ubuntu-drivers autoinstall
     sudo apt -y update
     sudo apt -y upgrade
+
+On Ubunto, you might need to update your drivers as well:
+
+    sudo ubuntu-drivers autoinstall
 
 ### Base dependencies
 First, we will need install a few base dependencies:
 
+**Ubuntu**
+
     sudo apt -y install python3 python3-venv python3-dev mysql-server supervisor nginx git
+
+**Raspbian**
+
+    sudo apt -y install python3 python3-venv python3-dev mariadb-server supervisor nginx git
 
 ### Installing the application
 Install the application through git:
@@ -56,8 +67,8 @@ Finally, you need to set the FLASK_APP environment variable in the system:
     echo "export FLASK_APP=run.py" >> ~/.profile
 The second line sets it so that the command is automatically run when you log in.
 
-### MySQL Database
-Enter the MySQL server with the following command:
+### Database
+Enter the database with the following command:
 
     sudo mysql
 
