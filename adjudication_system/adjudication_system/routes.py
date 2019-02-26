@@ -4,7 +4,8 @@ from adjudication_system import db
 from adjudication_system.adjudication_system import bp
 from adjudication_system.adjudication_system.forms import SplitForm, EventForm, CompetitionForm, \
     CreateFirstRoundForm, DefaultCompetitionForm, ConfigureNextRoundForm, DanceForm, DisciplineForm, DancingClassForm, \
-    PrintReportsForm, CoupleForm, EditCoupleForm, EditDancerForm, CreateAdjudicatorForm, DancerForm, ImportDancersForm
+    PrintReportsForm, CoupleForm, EditCoupleForm, EditDancerForm, CreateAdjudicatorForm, DancerForm, ImportDancersForm,\
+    ImportCouplesForm
 from adjudication_system.models import User, Event, Competition, DancingClass, Discipline, Dance, Round, \
     RoundType, Adjudicator, Couple, CouplePresent, RoundResult, DanceActive, Dancer, CompetitionMode, \
     create_couples_list, ADJUDICATOR_SYSTEM_TABLES, requires_access_level
@@ -662,6 +663,7 @@ def edit_dancer(dancer_id):
 @requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
 def available_couples():
     form = CoupleForm()
+    import_form = ImportCouplesForm()
     if request.method == POST:
         if form.submit.name in request.form:
             if form.validate_on_submit():
@@ -683,8 +685,33 @@ def available_couples():
                     flash("{lead} and {follow} are already a couple."
                           .format(lead=form.lead.data, follow=form.follow.data))
                 return redirect(url_for("adjudication_system.available_couples"))
+        if import_form.import_submit.name in request.form:
+            if import_form.validate_on_submit():
+                import_list = import_form.import_string.data.split('\r\n')
+                counter = 0
+                for import_string in import_list:
+                    d = import_string.split(',')
+                    check_lead = Dancer.query.filter(Dancer.name == d[0], Dancer.role == LEAD).first()
+                    check_follow = Dancer.query.filter(Dancer.name == d[1], Dancer.role == FOLLOW).first()
+                    check_competition = Competition.query.join(Discipline, DancingClass)\
+                        .filter(Discipline.name == d[2], DancingClass.name == d[3]).first()
+                    if check_lead is not None and check_follow is not None and check_competition is not None:
+                        couple = Couple()
+                        couple.lead = check_lead
+                        couple.follow = check_follow
+                        couple.competitions.append(check_competition)
+                        db.session.add(couple)
+                        counter += 1
+                db.session.commit()
+                if counter > 0:
+                    flash("Imported {} unique couples, and assigned them to the respective competition."
+                          .format(counter), "alert-success")
+                else:
+                    flash("No new couples imported.")
+                return redirect(url_for("adjudication_system.available_couples"))
     couples = Couple.query.all()
-    return render_template('adjudication_system/available_couples.html', form=form, couples=couples)
+    return render_template('adjudication_system/available_couples.html', form=form, import_form=import_form,
+                           couples=couples)
 
 
 @bp.route('/edit_couple/<int:couple_id>', methods=['GET', 'POST'])
@@ -1190,3 +1217,17 @@ def floor_manager():
                                 dance_id=dancing_round.first_dance().dance_id))
     dance = Dance.query.get(dance_id)
     return render_template('adjudication_system/floor_manager.html', dancing_round=dancing_round, dance=dance)
+
+
+@bp.route('/starting_lists', methods=['GET'])
+def starting_lists():
+    competitions = Competition.query.all()
+    competitions = {c: [] for c in competitions}
+    for c in competitions:
+        if c.is_single_partner():
+            competitions[c] = [couple for couple in c.couples]
+        else:
+            competitions[c] = [lead for lead in c.leads].extend([follow for follow in c.follows])
+    competitions = {c: competitions[c] for c in competitions if c.dancing_class.name != TEST
+                    and len(competitions[c]) != 0}
+    return render_template('adjudication_system/starting_lists.html', competitions=competitions)

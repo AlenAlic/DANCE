@@ -67,6 +67,12 @@ class ImportDancersForm(FlaskForm):
     import_submit = SubmitField('Import from string')
 
 
+class ImportCouplesForm(ImportDancersForm):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.import_string.label.text = "Import from CSV string (name_lead,name_follow,discipline,class)"
+
+
 class CoupleForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

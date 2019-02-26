@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import current_user, login_user, logout_user, login_required
 from adjudication_system.main import bp
 from adjudication_system.main.forms import LoginForm
@@ -37,6 +37,16 @@ def dashboard():
     if current_user.is_floor_manager():
         return redirect(url_for('adjudication_system.floor_manager_start_page'))
     return render_template('dashboard.html')
+
+
+@bp.route('/sw.js', methods=['GET'])
+def sw():
+    return current_app.send_static_file('sw.js')
+
+
+@bp.route('/offline', methods=['GET'])
+def offline():
+    return render_template('offline.html')
 
 
 @bp.route('/switch_page', methods=['GET'])

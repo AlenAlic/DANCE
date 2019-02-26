@@ -23,6 +23,12 @@
 
 {% block app_content %}
 <h2>{{ g.event }} - Couples</h2>
+<h3>Import couples from registration</h3>
+<form class="form" method="POST" enctype="multipart/form-data" novalidate>
+    {{ import_form.hidden_tag() }}
+    {{ wtf.form_field(import_form.import_string) }}
+    {{ wtf.form_field(import_form.import_submit) }}
+</form>
 <h2>Create couple</h2>
 <form class="form" method="POST" enctype="multipart/form-data" novalidate>
     {{ form.hidden_tag() }}
