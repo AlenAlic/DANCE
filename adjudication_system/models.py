@@ -644,9 +644,9 @@ class Round(db.Model):
             dances.sort(key=lambda x: DANCE_ORDER[self.competition.discipline.name][x.name])
             return dances[-1]
         except KeyError:
-            return self.dances[0]
+            return None
         except IndexError:
-            return self.dances[0]
+            return None
 
     def next_dance(self, dance):
         try:
@@ -654,9 +654,9 @@ class Round(db.Model):
             dances.sort(key=lambda x: DANCE_ORDER[self.competition.discipline.name][x.name])
             return dances[0]
         except KeyError:
-            return self.dances[0]
+            return None
         except IndexError:
-            return self.dances[0]
+            return None
 
     def last_dance(self):
         try:

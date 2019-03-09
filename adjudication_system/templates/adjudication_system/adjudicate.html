@@ -42,7 +42,7 @@ onload="onStart()"
 {% endblock %}
 
 {% block navbar %}
-<nav id="nav-bar" class="navbar sticky-top navbar-expand navbar-light adjudicator-nav-bar px-1" style="background:{% if not dancing_round.is_final() %}var(--secondary){% else %}{% if dancing_round.adjudicator_dance_placed(current_user.adjudicator, dance)|length == dancing_round.couples|length %}var(--success){% else %}var(--danger){% endif %}{% endif %};">
+<nav id="nav-bar" class="navbar sticky-top navbar-expand navbar-light adjudicator-nav-bar px-1" style="background-color:{% if not dancing_round.is_final() %}var(--secondary){% else %}{% if dancing_round.adjudicator_dance_placed(current_user.adjudicator, dance)|length == dancing_round.couples|length %}var(--success){% else %}var(--danger){% endif %}{% endif %};">
     <div class="adjudicator-status-bar">
         <div class="adjudicator-status-bar-cell-side">
             <div>
