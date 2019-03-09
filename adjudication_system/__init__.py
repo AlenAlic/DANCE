@@ -130,6 +130,9 @@ def create_app():
     from adjudication_system.main import bp as main_bp
     app.register_blueprint(main_bp)
 
+    from adjudication_system.errors import bp as errors_bp
+    app.register_blueprint(errors_bp)
+
     from adjudication_system.adjudication_system import bp as adjudication_system_bp
     app.register_blueprint(adjudication_system_bp, url_prefix='/adjudication_system')
 

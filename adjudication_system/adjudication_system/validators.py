@@ -1,6 +1,6 @@
 # noinspection PyProtectedMember
 from wtforms.validators import ValidationError
-from adjudication_system.models import Competition, CompetitionMode, Couple, Adjudicator
+from adjudication_system.models import Competition, CompetitionMode, Couple
 from adjudication_system.values import OPPOSITE_ROLES
 
 

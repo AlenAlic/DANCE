@@ -196,6 +196,7 @@ class Competition(db.Model):
     when = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
     rounds = db.relationship("Round", back_populates="competition", cascade='all, delete, delete-orphan')
     mode = db.Column(db.Enum(CompetitionMode))
+    results_published = db.Column(db.Boolean, nullable=False, default=False)
     couples = db.relationship("Couple", secondary=competition_couple_table, back_populates="competitions")
     leads = db.relationship("Dancer", secondary=competition_lead_table, back_populates="competitions_lead")
     follows = db.relationship("Dancer", secondary=competition_follow_table, back_populates="competitions_follow")
@@ -628,44 +629,44 @@ class Round(db.Model):
         return len(self.competition.adjudicators) > 0
 
     def first_dance(self):
-        dances = [d for d in self.dances if d.name in DANCE_ORDER[self.competition.discipline.name]]
         try:
+            dances = [d for d in self.dances if d.name in DANCE_ORDER[self.competition.discipline.name]]
             dances.sort(key=lambda x: DANCE_ORDER[self.competition.discipline.name][x.name])
             return dances[0]
         except KeyError:
-            return None
+            return self.dances[0]
         except IndexError:
-            return None
+            return self.dances[0]
 
     def previous_dance(self, dance):
-        dances = [d for d in self.dances if d.dance_id < dance.dance_id]
         try:
+            dances = [d for d in self.dances if d.dance_id < dance.dance_id]
             dances.sort(key=lambda x: DANCE_ORDER[self.competition.discipline.name][x.name])
             return dances[-1]
         except KeyError:
-            return None
+            return self.dances[0]
         except IndexError:
-            return None
+            return self.dances[0]
 
     def next_dance(self, dance):
-        dances = [d for d in self.dances if d.dance_id > dance.dance_id]
         try:
+            dances = [d for d in self.dances if d.dance_id > dance.dance_id]
             dances.sort(key=lambda x: DANCE_ORDER[self.competition.discipline.name][x.name])
             return dances[0]
         except KeyError:
-            return None
+            return self.dances[0]
         except IndexError:
-            return None
+            return self.dances[0]
 
     def last_dance(self):
-        dances = [d for d in self.dances]
         try:
+            dances = [d for d in self.dances]
             dances.sort(key=lambda x: DANCE_ORDER[self.competition.discipline.name][x.name])
             return dances[-1]
         except KeyError:
-            return None
+            return self.dances[0]
         except IndexError:
-            return None
+            return self.dances[0]
 
     def has_dance(self, dance_id):
         return dance_id in [d.dance_id for d in self.dances]
@@ -998,6 +999,11 @@ class Round(db.Model):
                     errors_list.append("{adjudicator} has zero marks in {dance}. This is probably an error."
                                        .format(adjudicator=adjudicator, dance=dance))
         return errors_list
+
+    def no_re_dance_couples(self):
+        previous_round = self.previous_round()
+        if previous_round is not None:
+            return [result.couple for result in self.round_results if result.marks == -1]
 
 
 class DanceActive(db.Model):

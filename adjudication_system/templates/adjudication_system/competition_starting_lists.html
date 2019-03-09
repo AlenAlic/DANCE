@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include "adjudication_system/_report_styling.html" %}
+
+{% with dancing_round = comp.rounds[-1] %}
+    {% include "adjudication_system/_report_qualified_starts.html" %}
+{% endwith %}
+
+{% endblock %}

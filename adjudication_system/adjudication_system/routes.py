@@ -281,6 +281,8 @@ def create_odk_competition(disc, d_class, start_time):
         time = time + timedelta(hours=3)
     if disc == SLOW_FOXTROT or disc == PASO_DOBLE or disc == POLKA:
         time = time + timedelta(hours=4)
+    if disc == QUICKSTEP or disc == JIVE:
+        time = time + timedelta(hours=5)
     if d_class == TEST:
         time = time + timedelta(hours=-1)
     if d_class == BREITENSPORT_QUALIFICATION:
@@ -796,7 +798,10 @@ def competition():
                 da.dance = dance
                 r.dance_active.append(da)
             r.couples = comp.generate_couples()
-            r.create_heats(round_form.heats.data)
+            if round_form.type.data == RoundType.final.name:
+                r.create_final()
+            else:
+                r.create_heats(round_form.heats.data)
             db.session.commit()
             flash("Created {type} for {comp}.".format(type=r.type.value, comp=comp), "alert-success")
             return redirect(url_for("adjudication_system.progress", round_id=r.round_id))
@@ -1222,7 +1227,7 @@ def floor_manager():
 @bp.route('/starting_lists', methods=['GET'])
 def starting_lists():
     competitions = Competition.query.all()
-    competitions = {c: [] for c in competitions}
+    competitions = {c: [] for c in competitions if len(c.rounds) > 0}
     for c in competitions:
         if c.is_single_partner():
             competitions[c] = [couple for couple in c.couples]
@@ -1230,4 +1235,26 @@ def starting_lists():
             competitions[c] = [lead for lead in c.leads].extend([follow for follow in c.follows])
     competitions = {c: competitions[c] for c in competitions if c.dancing_class.name != TEST
                     and len(competitions[c]) != 0}
-    return render_template('adjudication_system/starting_lists.html', competitions=competitions)
+    competition_id = request.args.get('competition', 0, int)
+    if competition_id in [c.competition_id for c in competitions]:
+        comp = Competition.query.get(competition_id)
+        return render_template('adjudication_system/competition_starting_lists.html', comp=comp)
+    else:
+        if competition_id > 0:
+            flash('Competition not found.')
+        return render_template('adjudication_system/starting_lists.html', competitions=competitions)
+
+
+@bp.route('/results', methods=['GET'])
+def results():
+    competitions = Competition.query.order_by(Competition.when).all()
+    competitions = [c for c in competitions if c.results_published and len(c.qualifications) == 0
+                    and c.dancing_class.name != TEST]
+    competition_id = request.args.get('competition', 0, int)
+    if competition_id in [c.competition_id for c in competitions]:
+        comp = Competition.query.get(competition_id)
+        return render_template('adjudication_system/competition_results.html', comp=comp)
+    else:
+        if competition_id > 0:
+            flash('Competition not found.')
+        return render_template('adjudication_system/results.html', competitions=competitions)

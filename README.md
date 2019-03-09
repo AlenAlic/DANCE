@@ -12,7 +12,7 @@ Before we start installing the system, start with the following commands to upda
     sudo apt -y update
     sudo apt -y upgrade
 
-On Ubunto, you might need to update your drivers as well:
+On Ubuntu, you might need to update your drivers as well:
 
     sudo ubuntu-drivers autoinstall
 
@@ -47,6 +47,8 @@ Create a virtualenv and activate it. Then install all the package dependencies i
 #### Config
 Create a file named the config.py file in the instance folder.
 
+    sudo nano instance/config.py
+
 The file should contain the following variables:
 
     ENV = 'production'
@@ -60,6 +62,8 @@ The file should contain the following variables:
 You can create the SECRET_KEY for the website, and password for the MySQL database using the following command:
 
     python3 -c "import uuid; print(uuid.uuid4().hex)"
+
+Save the config file (Ctrl+x, y, Enter).
 
 Finally, you need to set the FLASK_APP environment variable in the system:
 
@@ -105,7 +109,7 @@ Create a file called *xtdsas.conf* in the folder */etc/supervisor/conf.d/*
 Copy the data from below into that file and replace *<username>* with the username of the machine account.
 
     [program:xtdsas]
-    command=/home/<username>/xtds_adjudication_system/venv/bin/gunicorn -b localhost:8000 -w 2 run:app
+    command=/home/<username>/xtds_adjudication_system/venv/bin/gunicorn -b 127.0.0.1:8000 -w 2 run:app
     directory=/home/<username>/xtds_adjudication_system
     user=<username>
     autostart=true
@@ -139,7 +143,7 @@ Copy the data from below into that file and replace *<username>* with the userna
 
         location / {
             # forward application requests to the gunicorn server
-            proxy_pass http://localhost:8000;
+            proxy_pass http://127.0.0.1:8000;
             proxy_redirect off;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
