@@ -168,9 +168,35 @@ The xTDS Adjudication System should be available on the local network through th
 ### Allow external access
 If you wish to reach the site through the internet, you'll need a firewall and allow outside access to the server.
 
-We'll install ufw (the Uncomplicated Firewall), and configure to allow external traffic on port 80 (http). We'll add port 22 (ssh) so that you do not always need to be physically next to the server.
+We'll install ufw (the Uncomplicated Firewall), and configure to allow external traffic on port 80 (http), and port 443 (https). We'll add port 22 (ssh) so that you do not always need to be physically next to the server.
 
     sudo apt install -y ufw
     sudo ufw allow http
+    sudo ufw allow https
     sudo ufw allow ssh
     sudo ufw --force enable
+
+### SSL Certificate
+To have our website accessible through HTTPS, we'll use Certbot to install a Let's Encrypt certificate.
+
+To install Certbot, run the following commands.
+
+    sudo apt install -y software-properties-common
+    sudo add-apt-repository universe
+    sudo add-apt-repository ppa:certbot/certbot
+
+You will be prompted to install the certbot package. Press ENTER to proceed.
+
+    sudo apt install -y certbot python-certbot-nginx
+
+To install the certificate, use the following command.
+
+    sudo certbot --nginx -d <your_domain>
+
+You will be prompted to enter an email address. This will address will be used to notify you for urgent renewal issues, or security notices. Enter a valid email address and press ENTER to proceed.
+
+Afterwards, press a, then ENTER to accept the terms for the Let's Encrypt service.
+
+Next, you will be asked if you will allow your email address to be shared with the EFF. This is up to your own discretion.
+
+Lastly, you will be prompted whether or not you wish to redirect all traffic from HTTP to HTTPS. Press 2, and then ENTER to redirect all traffic to HTTPS.

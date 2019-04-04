@@ -61,8 +61,9 @@ class EditDancerForm(FlaskForm):
 
 
 class ImportDancersForm(FlaskForm):
-    import_string = TextAreaField(label="Import from CSV string (number,name,is_lead,is_follow), where the is_lead "
-                                        "and is_follow columns are either TRUE or FALSE", validators=[DataRequired()],
+    import_string = TextAreaField(label="Import from CSV string (number,name,team,is_lead,is_follow), where "
+                                        "the is_lead and is_follow columns are either TRUE or FALSE",
+                                  validators=[DataRequired()],
                                   render_kw={"style": "resize:none", "rows": "4"})
     import_submit = SubmitField('Import from string')
 

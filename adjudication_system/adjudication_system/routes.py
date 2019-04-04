@@ -601,26 +601,27 @@ def available_dancers():
                 counter = 0
                 for import_string in import_list:
                     d = import_string.split(',')
-                    if d[3] == 'TRUE':
-                        check_dancer = Dancer.query.filter(Dancer.number == d[0], Dancer.role == LEAD).first()
-                        if check_dancer is None:
-                            dancer = Dancer()
-                            dancer.number = d[0]
-                            dancer.name = d[1]
-                            dancer.team = d[2]
-                            dancer.role = LEAD
-                            db.session.add(dancer)
-                            counter += 1
-                    if d[4] == 'TRUE':
-                        check_dancer = Dancer.query.filter(Dancer.number == d[0], Dancer.role == FOLLOW).first()
-                        if check_dancer is None:
-                            dancer = Dancer()
-                            dancer.number = d[0]
-                            dancer.name = d[1]
-                            dancer.team = d[2]
-                            dancer.role = FOLLOW
-                            db.session.add(dancer)
-                            counter += 1
+                    if len(d) == 5:
+                        if d[3] == 'TRUE':
+                            check_dancer = Dancer.query.filter(Dancer.number == d[0], Dancer.role == LEAD).first()
+                            if check_dancer is None:
+                                dancer = Dancer()
+                                dancer.number = d[0]
+                                dancer.name = d[1]
+                                dancer.team = d[2]
+                                dancer.role = LEAD
+                                db.session.add(dancer)
+                                counter += 1
+                        if d[4] == 'TRUE':
+                            check_dancer = Dancer.query.filter(Dancer.number == d[0], Dancer.role == FOLLOW).first()
+                            if check_dancer is None:
+                                dancer = Dancer()
+                                dancer.number = d[0]
+                                dancer.name = d[1]
+                                dancer.team = d[2]
+                                dancer.role = FOLLOW
+                                db.session.add(dancer)
+                                counter += 1
                 db.session.commit()
                 if counter > 0:
                     flash("Imported {} unique dancers.".format(counter), "alert-success")
@@ -693,20 +694,25 @@ def available_couples():
                 counter = 0
                 for import_string in import_list:
                     d = import_string.split(',')
-                    check_lead = Dancer.query.filter(Dancer.name == d[0], Dancer.role == LEAD).first()
-                    check_follow = Dancer.query.filter(Dancer.name == d[1], Dancer.role == FOLLOW).first()
-                    check_competition = Competition.query.join(Discipline, DancingClass)\
-                        .filter(Discipline.name == d[2], DancingClass.name == d[3]).first()
-                    if check_lead is not None and check_follow is not None and check_competition is not None:
-                        couple = Couple()
-                        couple.lead = check_lead
-                        couple.follow = check_follow
-                        couple.competitions.append(check_competition)
-                        db.session.add(couple)
-                        counter += 1
+                    if len(d) == 4:
+                        check_lead = Dancer.query.filter(Dancer.name == d[0], Dancer.role == LEAD).first()
+                        check_follow = Dancer.query.filter(Dancer.name == d[1], Dancer.role == FOLLOW).first()
+                        check_competition = Competition.query.join(Discipline, DancingClass)\
+                            .filter(Discipline.name == d[2], DancingClass.name == d[3]).first()
+                        if check_lead is not None and check_follow is not None and check_competition is not None:
+                            couple = Couple.query.filter(Couple.lead == check_lead, Couple.follow == check_follow)\
+                                .first()
+                            if couple is None:
+                                couple = Couple()
+                                couple.lead = check_lead
+                                couple.follow = check_follow
+                                couple.number = check_lead.number
+                            counter += 1
+                            couple.competitions.append(check_competition)
+                            db.session.add(couple)
                 db.session.commit()
                 if counter > 0:
-                    flash("Imported {} unique couples, and assigned them to the respective competition."
+                    flash("Imported/Updated {} couples."
                           .format(counter), "alert-success")
                 else:
                     flash("No new couples imported.")
