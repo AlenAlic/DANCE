@@ -1260,7 +1260,7 @@ def heat_lists():
 
 @bp.route('/starting_numbers', methods=['GET'])
 def starting_numbers():
-    dancers = Dancer.query.group_by(Dancer.number).all()
+    dancers = Dancer.query.distinct(Dancer.number).group_by(Dancer.number).all()
     return render_template('adjudication_system/competition_starting_numbers.html', dancers=dancers)
 
 
