@@ -1260,7 +1260,13 @@ def heat_lists():
 
 @bp.route('/starting_numbers', methods=['GET'])
 def starting_numbers():
-    dancers = Dancer.query.distinct(Dancer.number).group_by(Dancer.number).all()
+    all_dancers = Dancer.query.all()
+    all_numbers = []
+    dancers = []
+    for d in all_dancers:
+        if d.number not in all_numbers:
+            all_numbers.append(d.number)
+            dancers.append(d)
     return render_template('adjudication_system/competition_starting_numbers.html', dancers=dancers)
 
 
