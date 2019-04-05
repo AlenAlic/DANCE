@@ -1233,14 +1233,7 @@ def floor_manager():
 @bp.route('/starting_lists', methods=['GET'])
 def starting_lists():
     competitions = Competition.query.all()
-    competitions = {c: [] for c in competitions if len(c.rounds) > 0}
-    for c in competitions:
-        if c.is_single_partner():
-            competitions[c] = [couple for couple in c.couples]
-        else:
-            competitions[c] = [lead for lead in c.leads].extend([follow for follow in c.follows])
-    competitions = {c: competitions[c] for c in competitions if c.dancing_class.name != TEST
-                    and len(competitions[c]) != 0}
+    competitions = [c for c in competitions if len(c.couples) > 0 and c.dancing_class.name != TEST]
     competition_id = request.args.get('competition', 0, int)
     if competition_id in [c.competition_id for c in competitions]:
         comp = Competition.query.get(competition_id)
@@ -1249,6 +1242,26 @@ def starting_lists():
         if competition_id > 0:
             flash('Competition not found.')
         return render_template('adjudication_system/starting_lists.html', competitions=competitions)
+
+
+@bp.route('/heat_lists', methods=['GET'])
+def heat_lists():
+    competitions = Competition.query.all()
+    competitions = [c for c in competitions if len(c.rounds) > 0 and c.dancing_class.name != TEST]
+    competition_id = request.args.get('competition', 0, int)
+    if competition_id in [c.competition_id for c in competitions]:
+        comp = Competition.query.get(competition_id)
+        return render_template('adjudication_system/competition_heat_lists.html', comp=comp)
+    else:
+        if competition_id > 0:
+            flash('Competition not found.')
+        return render_template('adjudication_system/heat_lists.html', competitions=competitions)
+
+
+@bp.route('/starting_numbers', methods=['GET'])
+def starting_numbers():
+    dancers = Dancer.query.group_by(Dancer.number).all()
+    return render_template('adjudication_system/competition_starting_numbers.html', dancers=dancers)
 
 
 @bp.route('/results', methods=['GET'])

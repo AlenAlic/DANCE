@@ -4,8 +4,8 @@
 {% include "adjudication_system/_report_styling.html" %}
 
 <div class="container mb-5">
-{% with comp = comp %}
-    {% include "adjudication_system/_starting_lists.html" %}
+{% with dancing_round = comp.rounds[-1] %}
+    {% include "adjudication_system/_report_heats_by_number.html" %}
 {% endwith %}
 </div>
 
