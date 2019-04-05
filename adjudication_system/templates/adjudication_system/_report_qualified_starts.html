@@ -7,7 +7,7 @@
 </colgroup>
 <thead>
     <tr>
-        <td class="title-box first-col" colspan="4">{{dancing_round}} <br/>Qualified starts</td>
+        <td class="title-box first-col" colspan="4">{{dancing_round}} <br/>Qualified starts{% if dancing_round.competition.is_change_per_dance() or config.get(g.data.ODK) %} - Sorted by Leads{% endif %}</td>
     </tr>
     <tr class="top-row separator">
         <td class="first-col">#</td>
@@ -27,7 +27,7 @@
         </tr>
         {% endfor %}
     {% else %}
-        {% for couple in dancing_round.couples %}
+        {% for couple in dancing_round.couples|sort(attribute='number') %}
         <tr>
             <td class="first-col">{{couple.number}}</td>
             <td>{{couple.lead}}</td>
@@ -38,7 +38,7 @@
     {% endif %}
 </tbody>
 </table>
-{% if dancing_round.competition.is_change_per_dance() %}
+{% if dancing_round.competition.is_change_per_dance() or config.get(g.data.ODK) %}
 <table class="report" id="qualified-starts-follows">
 <colgroup>
     <col span="1" style="width: 10%;">
@@ -48,7 +48,7 @@
 </colgroup>
 <thead>
     <tr>
-        <td class="title-box first-col" colspan="4">{{dancing_round}} <br/>Qualified starts</td>
+        <td class="title-box first-col" colspan="4">{{dancing_round}} <br/>Qualified starts - Sorted by Follows</td>
     </tr>
     <tr class="top-row separator">
         <td class="first-col">#</td>
@@ -61,7 +61,7 @@
     {% for couple in dancing_round.couples|sort(attribute='follow.number') %}
     <tr>
         <td class="first-col">{{couple.follow.number}}</td>
-        <td></td>
+        <td>{% if not dancing_round.competition.is_change_per_dance() %}{{couple.lead}}{% endif %}</td>
         <td>{{couple.follow}}</td>
         <td>{{couple.follow.team}}</td>
     </tr>
