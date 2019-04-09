@@ -54,7 +54,7 @@
         <td class="first-col">#</td>
         <td>Lead</td>
         <td>Follow</td>
-        <td>Team</td>
+        <td>Team{% if not comp.is_change_per_dance() %}(s){% endif %}</td>
     </tr>
 </thead>
 <tbody>
