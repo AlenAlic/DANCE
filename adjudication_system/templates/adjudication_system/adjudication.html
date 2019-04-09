@@ -21,7 +21,23 @@ input[type=checkbox]:checked + label
 {% if dancing_round.round_results|length == 0 %}
 <div class="mt-4 mb-3">
 <form style="display:inline" method="POST" enctype="multipart/form-data" novalidate>
-    <button class="btn btn-primary mr-5" name="evaluate">Close & evaluate round</button>
+    <button class="btn btn-primary mr-5" type="button" data-toggle="modal" data-target="#close-and-evaluate">Close & evaluate round</button>
+    <div align="left" class="modal fade" id="close-and-evaluate" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you wish to close and evaluate the round?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary mr-5" name="evaluate">Yes, close & evaluate</button>
+                    <button type="button" class="btn btn-secondary ml-2" data-dismiss="modal">No, not yet</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <button class="btn btn-outline-primary mr-5" name="refresh">Refresh</button>
 </form>
 <button id="toggle-round" class="btn btn-{% if dancing_round.is_active %}danger{% else %}success{% endif %}" onclick="toggleRoundAPI()">{% if dancing_round.is_active %}Close round & disable all dances{% else %}Open round & enable all dances{% endif %}</button>
@@ -30,7 +46,7 @@ input[type=checkbox]:checked + label
 <nav class="mb-2">
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
         {% for dance in dancing_round.dances %}
-            {% if dancing_round.round_results|length == 0 %}<button id="dance-{{dance.dance_id}}" class="btn btn-sm btn-{% if dancing_round.is_dance_active(dance) %}danger{% else %}success{% endif %}" onclick="toggleDanceAPI(this)">{% if dancing_round.is_dance_active(dance) %}Disable{% else %}Enable{% endif %}</button>{% endif %}
+            {% if dancing_round.round_results|length == 0 %}<button data-id="{{dance.dance_id}}" id="dance-{{dance.dance_id}}" class="btn btn-sm btn-{% if dancing_round.is_dance_active(dance) %}danger{% else %}success{% endif %}" onclick="toggleDanceAPI(this)">{% if dancing_round.is_dance_active(dance) %}Disable{% else %}Enable{% endif %}</button>{% endif %}
             <a class="nav-item nav-link mr-5 {% if request.args.get('dance_id')|int == dance.dance_id|int %}active{% endif %}" href="{{url_for('adjudication_system.adjudication', round_id=dancing_round.round_id, dance_id=dance.dance_id)}}">{{dance}}</a>
         {% endfor %}
     </div>
@@ -44,8 +60,10 @@ input[type=checkbox]:checked + label
     {% if dancing_round.round_results|length == 0 %}
     <button class="btn btn-primary my-2" type="submit" name="save_marks" {% if dancing_round.is_dance_active(dance) %} disabled {% endif %}>Save crosses</button>
     {% endif %}
-    {% for list in dancing_round.adjudicator_mark_list() %}
-        <h5>{{ list['adjudicator'] }}</h5>
+    {% for list in dancing_round.adjudicator_mark_list()|sort(attribute='adjudicator') %}
+        {% set marked = list['marks'][dance.dance_id|string]|selectattr('mark')|list|length %}
+        <h5>{{ list['adjudicator'] }} {% if marked >= dancing_round.min_marks and marked <= dancing_round.max_marks %}<i class="fas fa-check-circle"></i>{% else %}<i class="far fa-times-circle"></i>{% endif %}</h5>
+        <h6>{{ marked }} / {{dancing_round.min_marks}}{% if dancing_round.max_marks != dancing_round.min_marks %}-{{dancing_round.max_marks}}{% endif %}</h6>
         {% for mark in list['marks'][dance.dance_id|string] %}
             <div class="form-check form-check-inline mb-1 mr-0">
                 <table>
@@ -55,8 +73,8 @@ input[type=checkbox]:checked + label
                     </tr>
                     <tr>
                         <td class="adjudicator-cell" align="center" style="{% if dancing_round.is_dance_active(dance) %}opacity: 0.5;background:#AAA;{% else %}opacity: 1;background#FFF{% endif %}">
-                            <input type="checkbox" id="{{mark.mark_id}}" name="{{mark.mark_id}}" style="display:none;" {% if mark.mark %}checked{% endif %} {% if dancing_round.is_dance_active(dance) %}disabled{% endif %}/>
-                            <label class="mb-0" for="{{mark.mark_id}}"></label>
+                            <input type="checkbox" id="{{mark.mark_id}}" name="{{mark.mark_id}}" style="display:none;" {% if mark.mark %}checked{% endif %} {# if dancing_round.is_dance_active(dance) %}disabled{% endif #}/>
+                            <label class="mb-0" for="{{mark.mark_id}}" style="background-color:inherit;"></label>
                         </td>
                     </tr>
                     </tbody>
@@ -107,7 +125,7 @@ toggleRoundAPI = () => {
     .catch(function(error) {console.log('Error: \n', error); });
 }
 toggleDanceAPI = btn => {
-    fetch("/adjudication_system/api/to/round/" + {{dancing_round.round_id}} + "/dance/" + btn.id, {method: "PATCH"})
+    fetch("/adjudication_system/api/to/round/" + {{dancing_round.round_id}} + "/dance/" + btn.dataset.id, {method: "PATCH"})
     .then(function(response) {return response.json();})
     .then(function(result) {location.reload(true);})
     .catch(function(error) {console.log('Error: \n', error); });
