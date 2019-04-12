@@ -49,7 +49,11 @@ onload="onStart()"
                 {% if dancing_round.previous_dance(dance) is not none %}
                 <a class="nav-item btn btn-outline-light" href="{{url_for('adjudication_system.adjudicate', round_id=dancing_round.round_id, dance_id=dancing_round.previous_dance(dance).dance_id)}}">{{dancing_round.previous_dance(dance)}}</a>
                 {% else %}
+                {% if dancing_round.competition.rounds|length == 1 %}
+                <a class="nav-item btn btn-outline-light" href="{{ url_for('adjudication_system.adjudicator_dashboard') }}">Exit</a>
+                {% else %}
                 <a class="nav-item btn btn-outline-light" href="{{ url_for('adjudication_system.adjudicate_start_page', round_id=dancing_round.round_id) }}">Exit</a>
+                {% endif %}
                 {% endif %}
                 <div>{% if not dancing_round.is_final() %}Target: {{ dancing_round.min_marks }}{% if dancing_round.min_marks != dancing_round.max_marks %} ... {{ dancing_round.max_marks }}{% endif %}{% endif %}</div>
             </div>
@@ -72,7 +76,11 @@ onload="onStart()"
                 {% if dancing_round.next_dance(dance) is not none %}
                 <a class="nav-item btn btn-outline-light" href="{{url_for('adjudication_system.adjudicate', round_id=dancing_round.round_id, dance_id=dancing_round.next_dance(dance).dance_id)}}">{{dancing_round.next_dance(dance)}}</a>
                 {% else %}
+                {% if dancing_round.competition.rounds|length == 1 %}
+                <a class="nav-item btn btn-outline-light" href="{{ url_for('adjudication_system.adjudicator_dashboard') }}">Exit</a>
+                {% else %}
                 <a class="nav-item btn btn-outline-light" href="{{ url_for('adjudication_system.adjudicate_start_page', round_id=dancing_round.round_id) }}">Exit</a>
+                {% endif %}
                 {% endif %}
                 <div>{% if not dancing_round.is_final() %}Noted: <span id="noted-couples">{{dancing_round.adjudicator_dance_noted(current_user.adjudicator, dance)|length}}</span>{% endif %}</div>
             </div>

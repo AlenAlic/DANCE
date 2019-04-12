@@ -9,7 +9,11 @@
         {% for competition in current_user.adjudicator.competitions|sort(attribute='when') %}
         {% if competition.rounds|length > 0 %}
             {% if competition.last_round().is_active %}
-                    <a class="btn btn-primary my-2" style="display:block;" href="{{url_for('adjudication_system.adjudicate_start_page', round_id=competition.last_round().round_id)}}">{{competition}}</a>
+                {% if competition.rounds|length == 1 %}
+                <a class="btn btn-primary my-2" style="display:block;" href="{{url_for('adjudication_system.adjudicate', round_id=competition.last_round().round_id)}}">{{competition}}</a>
+                {% else %}
+                <a class="btn btn-primary my-2" style="display:block;" href="{{url_for('adjudication_system.adjudicate_start_page', round_id=competition.last_round().round_id)}}">{{competition}}</a>
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endfor %}
