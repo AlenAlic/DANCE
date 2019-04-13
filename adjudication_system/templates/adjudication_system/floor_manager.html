@@ -19,6 +19,7 @@
 </nav>
 {% for heat in dancing_round.heats %}
     {% if heat.dance == dance %}
+        {% if not dancing_round.is_final() %}
         <h4>{{heat.dance}} / Heat {{heat.number}}</h4>
         {% for present in heat.couples_present|sort(attribute='couple.number') %}
             <div class="form-check form-check-inline mb-3 mr-4">
@@ -26,6 +27,11 @@
                 <label class="form-check-label mx-2 couple-number-label" for="{{present.couple_present_id}}"><b>{{present.couple.number}}</b></label>
             </div>
         {% endfor %}
+        {% elif config.get(g.data.ODK) %}
+        {% for couple in dancing_round.couples|sort(attribute='number') %}
+        <h2>{{couple}}</h2>
+        {% endfor %}
+        {% endif %}
     {% endif %}
 {% endfor %}
 {% endblock %}
