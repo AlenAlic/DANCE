@@ -28,7 +28,7 @@ input[type=checkbox]    {transform:scale(2);}
                         <a class="nav-link py-1 disabled" style="font-size:large;"><b>{{competition}}</b></a>
                     </li>
                     {% for round in competition.rounds %}
-                        {% if not round.is_final() %}
+                        {% if not round.is_final() or config.get(g.data.ODK) %}
                         <li class="nav-item py-0">
                             <a class="nav-link py-0 {% if request.args.get('round_id')|int == round.round_id %}active{% endif %}" href="{{url_for('adjudication_system.floor_manager', round_id=round.round_id)}}">{{round.type.value}} ({{round.couples|length}})</a>
                         </li>
