@@ -1,6 +1,6 @@
-# xTDS Adjudication System
+# Dancing and Adjudication Network for Crossing Evaluation (DANCE) System
 
-A standalone version of the adjudication system that is integrated with the xTDS WebPortal.
+Web based adjudication system for Ballroom competitions.
 
 ## Installation (Ubuntu or Raspbian)
 This will assume a fresh installation of Ubuntu 18.04. The installation on Raspbian is similar.
