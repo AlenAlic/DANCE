@@ -31,8 +31,8 @@ First, we will need install a few base dependencies:
 Install the application through git:
 
     # clone the repository
-    git clone https://github.com/AlenAlic/xtds_adjudication_system
-    cd xtds_adjudication_system
+    git clone https://github.com/AlenAlic/DANCE
+    cd DANCE
 
 #### Dependencies
 Create a virtualenv and activate it. Then install all the package dependencies in the virtualenv:
@@ -54,7 +54,7 @@ The file should contain the following variables:
     ENV = 'production'
     DEBUG = False
     SECRET_KEY = 'random_string'
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://xtdsas:<db_password>@localhost:3306/xtdsas'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://dance:<db_password>@localhost:3306/dance'
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = False
@@ -76,11 +76,11 @@ Enter the database with the following command:
 
     sudo mysql
 
-Create a new database called **xtdsas**, along with a user with the same name, that has full access to the database.
+Create a new database called **dance**, along with a user with the same name, that has full access to the database.
 
-    create database xtdsas character set utf8 collate utf8_bin;
-    create user 'xtdsas'@'localhost' identified by '<db-password>';
-    grant all privileges on xtdsas.* to 'xtdsas'@'localhost';
+    create database dance character set utf8 collate utf8_bin;
+    create user 'dance'@'localhost' identified by '<db-password>';
+    grant all privileges on dance.* to 'dance'@'localhost';
     flush privileges;
     quit;
 
@@ -102,15 +102,15 @@ You can log in with the usernames *admin*, and *floor* as the tournament office 
 ### Gunicorn
 Gunicorn is a pure Python web server that will be used in stead of the built in Flask server. Though in stead of running gunicorn directly, we'll let it run through the supervisor package. Supervisor will then have it running in the background instead. Should something happen to the server, or if the machine is rebooted, the server will be restarted on its own.
 
-Create a file called *xtdsas.conf* in the folder */etc/supervisor/conf.d/*
+Create a file called *dance.conf* in the folder */etc/supervisor/conf.d/*
 
-    sudo nano /etc/supervisor/conf.d/xtdsas.conf
+    sudo nano /etc/supervisor/conf.d/dance.conf
 
 Copy the data from below into that file and replace *<username>* with the username of the machine account.
 
-    [program:xtdsas]
-    command=/home/<username>/xtds_adjudication_system/venv/bin/gunicorn -b 127.0.0.1:8000 -w 2 run:app
-    directory=/home/<username>/xtds_adjudication_system
+    [program:dance]
+    command=/home/<username>/DANCE/venv/bin/gunicorn -b 127.0.0.1:8000 -w 2 run:app
+    directory=/home/<username>/DANCE
     user=<username>
     autostart=true
     autorestart=true
@@ -130,9 +130,9 @@ After installation, Nginx already comes with a test site. remove it first:
 
     sudo rm /etc/nginx/sites-enabled/default
 
- Create a file called *xtdsas. in the folder */etc/nginx/sites-enabled/*
+ Create a file called *dance. in the folder */etc/nginx/sites-enabled/*
 
-    sudo nano /etc/nginx/sites-enabled/xtdsas
+    sudo nano /etc/nginx/sites-enabled/dance
 
 Copy the data from below into that file and replace *<username>* with the username of the machine account.
 
@@ -152,7 +152,7 @@ Copy the data from below into that file and replace *<username>* with the userna
 
         location /static {
             # handle static files directly, without forwarding to the application
-            alias /home/<username>/xtds_adjudication_system/adjudication_system/static;
+            alias /home/<username>/DANCE/adjudication_system/static;
             expires 30d;
         }
     }
