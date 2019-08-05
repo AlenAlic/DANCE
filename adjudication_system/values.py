@@ -625,7 +625,7 @@ PATCH = "PATCH"
 # ACCESS
 TOURNAMENT_OFFICE_MANAGER = 'tournament_office_manager'
 FLOOR_MANAGER = 'floor_manager'
-ADJUDICATOR = 'team_captain'
+ADJUDICATOR = 'adjudicator'
 
 ACCESS = {
     TOURNAMENT_OFFICE_MANAGER: 0,
