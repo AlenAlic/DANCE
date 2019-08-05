@@ -42,8 +42,7 @@ class EditDancerForm(FlaskForm):
         self.role.data = dancer.role
         self.number.data = dancer.number
         self.team.data = dancer.team
-        self.partners.data = ', '.join(["{p0} ({p1})".format(p0=p[0], p1=', '.join(['{}'.format(d) for d in p[1]]))
-                                        for p in dancer.partners()])
+        self.partners.data = ', '.join([f"{p[0]} ({', '.join([f'{d}' for d in p[1]])})" for p in dancer.partners()])
         self.competitions.choices = [(c.competition_id, c) for c in Competition.query.join(
             DancingClass, Competition.dancing_class_id == DancingClass.dancing_class_id)
             .filter(DancingClass.name != TEST, Competition.mode != CompetitionMode.single_partner)
@@ -144,8 +143,7 @@ class DisciplineForm(FlaskForm):
 
 class DancingClassForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()],
-                       description="{qualification}, {amateurs}, {open_class}, etc."
-                       .format(qualification=BREITENSPORT_QUALIFICATION, amateurs=AMATEURS, open_class=OPEN_CLASS))
+                       description=f"{BREITENSPORT_QUALIFICATION}, {AMATEURS}, {OPEN_CLASS}, etc.")
     dancing_class_submit = SubmitField('Create Class')
 
 
@@ -223,9 +221,7 @@ class CompetitionForm(FlaskForm):
                             self.competition_follows.data = all_follows[270:300]  # TESTING
 
     dancing_class = QuerySelectField('Class', validators=[DataRequired()], allow_blank=True, blank_text="",
-                                     description="{qualification}, {amateurs}, {open_class}, etc."
-                                     .format(qualification=BREITENSPORT_QUALIFICATION, amateurs=AMATEURS,
-                                             open_class=OPEN_CLASS))
+                                     description=f"{BREITENSPORT_QUALIFICATION}, {AMATEURS}, {OPEN_CLASS}, etc.")
     discipline = QuerySelectField('Discipline', validators=[DataRequired()], allow_blank=True, blank_text="",
                                   description="Usually Ballroom or Latin")
     qualification = QuerySelectField('Qualification', allow_blank=True, blank_text="",

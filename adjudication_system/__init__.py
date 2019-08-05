@@ -65,7 +65,6 @@ class Anonymous(AnonymousUserMixin):
 
 
 def create_app():
-    # Import for creating WebCie account
     from adjudication_system.models import User, Event, Competition, DancingClass, Discipline, Dance, Round, \
         Heat, Couple, Adjudicator, Mark, CouplePresent, RoundResult, FinalPlacing, DanceActive, CompetitionMode, Dancer
 

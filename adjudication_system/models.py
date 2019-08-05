@@ -75,6 +75,16 @@ def requires_access_level(access_levels):
     return decorator
 
 
+def requires_adjudicator_access_level(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_adjudicator():
+            flash("Page inaccessible.")
+            return redirect(url_for('main.index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @login.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -211,8 +221,11 @@ class Competition(db.Model):
     def __repr__(self):
         return '{disc} {cls}'.format(cls=self.dancing_class, disc=self.discipline)
 
+    def name(self):
+        return self.__repr__()
+
     def short_repr(self):
-        return '{disc}{cls}'.format(cls=self.discipline.name[:2], disc=self.dancing_class.name[:2])
+        return f'{self.discipline.name[:2]}{self.dancing_class.name[:2]}'
 
     def first_round(self):
         try:
@@ -296,17 +309,15 @@ class Competition(db.Model):
     def competitors(self, numbers_only=False):
         if not numbers_only:
             if self.mode == CompetitionMode.single_partner:
-                return "{couples} couple{plural}"\
-                    .format(couples=len(self.couples), plural='' if len(self.couples) == 1 else 's')
+                return f"{len(self.couples)} couple{'' if len(self.couples) == 1 else 's'}"
             else:
-                return "{leads} lead{leads_plural} / {follows} follow{follows_plural}"\
-                    .format(leads=len(self.leads),  leads_plural='' if len(self.leads) == 1 else 's',
-                            follows=len(self.follows), follows_plural='' if len(self.follows) == 1 else 's')
+                return f"{len(self.leads)} lead{'' if len(self.leads) == 1 else 's'} / {len(self.follows)} " \
+                    f"follow{'' if len(self.follows) == 1 else 's'}"
         else:
             if self.mode == CompetitionMode.single_partner:
-                return "{}".format(len(self.couples))
+                return f"{len(self.couples)}"
             else:
-                return "{leads}/{follows}".format(leads=len(self.leads), follows=len(self.follows))
+                return f"{len(self.leads)}/{len(self.follows)}"
 
     def dancers(self):
         return [d for d in self.leads + self.follows]
@@ -454,7 +465,7 @@ class Dancer(db.Model):
     competitions_follow = db.relationship("Competition", secondary=competition_follow_table, back_populates="follows")
 
     def __repr__(self):
-        return '{}'.format(self.name)
+        return f'{self.name}'
 
     def partners(self):
         if self.role == LEAD:
@@ -524,7 +535,10 @@ class Couple(db.Model):
         if self.lead.team == self.follow.team:
             return self.lead.team
         else:
-            return "{lead} / {follow}".format(lead=self.lead.team, follow=self.follow.team)
+            return f"{self.lead.team} / {self.follow.team}"
+
+    def names(self):
+        return f"{self.lead.name} / {self.follow.name}"
 
 
 class RoundType(enum.Enum):
@@ -791,7 +805,7 @@ class Round(db.Model):
         round_result_list.sort()
         unique_results = list(set(round_result_list))
         unique_results.sort(reverse=True)
-        return [(-1, "all couples")] + [(r, "{} marks".format(r)) for r in unique_results]
+        return [(-1, f"all couples")] + [(r, f"{r} marks") for r in unique_results]
 
     def change_per_dance_dancers_rows(self):
         round_result_list = [r for r in self.marks()]
@@ -836,7 +850,7 @@ class Round(db.Model):
             dancers = [d for d in dancers_list if d['crosses'] >= r]
             if len([d for d in dancers if d['lead']]) == len([d for d in dancers if d['follow']]):
                 viable_unique_results.append(r)
-        return [(-1, "all couples")] + [(r, "{} marks".format(r)) for r in viable_unique_results]
+        return [(-1, f"all couples")] + [(r, f"{r} marks") for r in viable_unique_results]
 
     def adjudicator_dance_marks(self, adjudicator, dance):
         marks = list(itertools.chain.from_iterable([h.marks for h in self.heats if h.dance == dance]))
@@ -1002,8 +1016,7 @@ class Round(db.Model):
             for dance in self.dances:
                 marks = [m.mark for m in self.adjudicator_marks(adjudicator, dance)]
                 if True not in marks:
-                    errors_list.append("{adjudicator} has zero marks in {dance}. This is probably an error."
-                                       .format(adjudicator=adjudicator, dance=dance))
+                    errors_list.append(f"{adjudicator} has zero marks in {dance}. This is probably an error.")
         return errors_list
 
     def no_re_dance_couples(self):
@@ -1111,8 +1124,12 @@ class CouplePresent(db.Model):
     heat = db.relationship("Heat", back_populates="couples_present")
 
     def __repr__(self):
-        return '{round} - {dance} - {couple}'\
-            .format(couple=self.couple, dance=self.heat.dance, round=self.heat.round)
+        return f"{self.heat.round} - {self.heat.dance} - {self.couple}"
+
+    def couple_number(self):
+        if self.heat.round.competition.mode in CHANGE_MODES:
+            return f"{self.couple.lead.number} / {self.couple.follow.number}"
+        return self.couple.number
 
 
 class RoundResult(db.Model):
