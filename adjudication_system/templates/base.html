@@ -121,6 +121,18 @@ $(document).ready(function($) {
 {% endmacro %}
 
 
+{% macro react() %}
+    {% if config.get('ENV') == g.data.DEBUG_ENV %}
+    <script src="{{url_for('static', filename='react/react.development.js')}}{{ aver }}"></script>
+    <script src="{{url_for('static', filename='react/react-dom.development.js')}}{{ aver }}"></script>
+    {% else %}
+    <script src="{{url_for('static', filename='react/react.production.min.js')}}{{ aver }}"></script>
+    <script src="{{url_for('static', filename='react/react-dom.production.min.js')}}{{ aver }}"></script>
+    {% endif %}
+    <script src="{{url_for('static', filename='js/react/util.js')}}{{ aver }}" ></script>
+{% endmacro %}
+
+
 {% macro icon(type) -%}
 <img src="{{url_for('static', filename='octicons/'+type+'.svg')}}">
 {%- endmacro %}

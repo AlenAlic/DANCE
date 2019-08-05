@@ -63,6 +63,10 @@ class Anonymous(AnonymousUserMixin):
     def is_adjudicator():
         return False
 
+    @staticmethod
+    def is_presenter():
+        return False
+
 
 def create_app():
     from adjudication_system.models import User, Event, Competition, DancingClass, Discipline, Dance, Round, \
@@ -97,8 +101,8 @@ def create_app():
     admin.add_view(AdjudicatorSystemView(CouplePresent, db.session))
     admin.add_view(AdjudicatorSystemView(RoundResult, db.session))
 
-    # Shell command for creating tournament office (admin) account and a floor manager account
-    def create_tournament_office(tournament_office_password, floor_manager_password):
+    # Shell command for creating tournament office (admin) account, a floor manager account, and a presenter account
+    def create_tournament_office(tournament_office_password, floor_manager_password, presenter_password):
         with app.app_context():
             user = User()
             user.username = 'admin'
@@ -112,6 +116,12 @@ def create_app():
             fm.is_active = True
             fm.access = values.ACCESS[values.FLOOR_MANAGER]
             db.session.add(fm)
+            p = User()
+            p.username = 'presenter'
+            p.set_password(presenter_password)
+            p.is_active = True
+            p.access = values.ACCESS[values.PRESENTER]
+            db.session.add(p)
             db.session.commit()
 
     @app.shell_context_processor
@@ -137,6 +147,9 @@ def create_app():
 
     from adjudication_system.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/adjudication_system/api')
+
+    from adjudication_system.presenter import bp as pres_bp
+    app.register_blueprint(pres_bp, url_prefix='/presenter')
 
     return app
 

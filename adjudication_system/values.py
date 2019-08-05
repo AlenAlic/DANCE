@@ -626,10 +626,12 @@ PATCH = "PATCH"
 TOURNAMENT_OFFICE_MANAGER = 'tournament_office_manager'
 FLOOR_MANAGER = 'floor_manager'
 ADJUDICATOR = 'adjudicator'
+PRESENTER = 'presenter'
 
 ACCESS = {
     TOURNAMENT_OFFICE_MANAGER: 0,
     FLOOR_MANAGER: 2,
+    PRESENTER: 4,
     ADJUDICATOR: 10,
 }
 
