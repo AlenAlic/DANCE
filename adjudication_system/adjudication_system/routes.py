@@ -88,14 +88,20 @@ def create_dances():
 def create_dancing_classes():
     DancingClass.query.delete()
     db.session.commit()
-    if not current_app.config.get(ODK):
-        for dc in DANCING_CLASSES:
+    if current_app.config.get(ODK):
+        for dc in ODK_CLASSES:
+            dancing_class = DancingClass()
+            dancing_class.name = dc
+            db.session.add(dancing_class)
+            db.session.commit()
+    elif current_app.config.get(SOND):
+        for dc in SOND_CLASSES:
             dancing_class = DancingClass()
             dancing_class.name = dc
             db.session.add(dancing_class)
             db.session.commit()
     else:
-        for dc in ODK_CLASSES:
+        for dc in DANCING_CLASSES:
             dancing_class = DancingClass()
             dancing_class.name = dc
             db.session.add(dancing_class)
@@ -105,7 +111,13 @@ def create_dancing_classes():
 def create_disciplines():
     Discipline.query.delete()
     db.session.commit()
-    if not current_app.config.get(ODK):
+    if current_app.config.get(ODK):
+        for d in DANCES + BONUS_DANCES:
+            db.session.add(Discipline(name=d['name']))
+            db.session.commit()
+            bonus = Discipline.query.filter(Discipline.name == d['name']).first()
+            bonus.dances.append(Dance.query.filter(Dance.name == d['name']).first())
+    else:
         for d in ALL_COMPETITIONS:
             discipline = Discipline()
             discipline.name = d
@@ -115,12 +127,6 @@ def create_disciplines():
         ballroom.dances.extend(Dance.query.filter(Dance.name.in_(BALLROOM_DANCES)).all())
         latin = Discipline.query.filter(Discipline.name == LATIN).first()
         latin.dances.extend(Dance.query.filter(Dance.name.in_(LATIN_DANCES)).all())
-    else:
-        for d in DANCES + BONUS_DANCES:
-            db.session.add(Discipline(name=d['name']))
-            db.session.commit()
-            bonus = Discipline.query.filter(Discipline.name == d['name']).first()
-            bonus.dances.append(Dance.query.filter(Dance.name == d['name']).first())
     db.session.commit()
 
 
@@ -162,8 +168,13 @@ def event():
             create_base()
             start_time = datetime(default_form.when.data.year, default_form.when.data.month,
                                   default_form.when.data.day, 9, 0, 0)
-            if not current_app.config.get(ODK):
+            if current_app.config.get(ODK):
+                generate_odk_competitions(start_time)
+            elif current_app.config.get(SOND):
+                generate_sond_competitions(start_time, default_form)
+            else:
                 create_default_competition(BALLROOM, TEST, start_time)
+                create_default_competition(LATIN, TEST, start_time)
                 if default_form.beginners.data:
                     create_default_competition(BALLROOM, BEGINNERS, start_time)
                     create_default_competition(LATIN, BEGINNERS, start_time)
@@ -189,8 +200,6 @@ def event():
                 if default_form.open_class.data:
                     create_default_competition(BALLROOM, OPEN_CLASS, start_time)
                     create_default_competition(LATIN, OPEN_CLASS, start_time)
-            else:
-                generate_odk_competitions(start_time)
             flash("Created base dances, disciplines, classes, and the chosen default competitions.")
             return redirect(url_for('adjudication_system.event'))
     form = request.args
@@ -251,6 +260,7 @@ def create_default_competition(disc, d_class, start_time):
 
 def generate_odk_competitions(time):
     create_odk_competition(SLOW_WALTZ, TEST, time)
+    create_odk_competition(SAMBA, TEST, time)
     for d in DANCES + BONUS_DANCES:
         if d['name'] in BALLROOM_DANCES or d['name'] in LATIN_DANCES:
             create_odk_competition(d['name'], BREITENSPORT_QUALIFICATION, time)
@@ -285,8 +295,8 @@ def create_odk_competition(disc, d_class, start_time):
         time = time + timedelta(hours=5)
     if d_class == TEST:
         time = time + timedelta(hours=-1)
-    if d_class == BREITENSPORT_QUALIFICATION:
-        time = time + timedelta(minutes=0)
+        if disc == SAMBA:
+            time = time - timedelta(days=1) + timedelta(minutes=30)
     if d_class == BREITENSPORT_QUALIFICATION:
         time = time + timedelta(minutes=0)
     if d_class == AMATEURS:
@@ -300,6 +310,103 @@ def create_odk_competition(disc, d_class, start_time):
     c.event = g.event
     if d_class in BREITENSPORT_COMPETITIONS:
         c.qualification = Competition.query.join(DancingClass, Discipline)\
+            .filter(DancingClass.name == BREITENSPORT_QUALIFICATION, Discipline.name == disc).first()
+    db.session.commit()
+
+
+def generate_sond_competitions(time, form):
+    create_sond_competition(BALLROOM, TEST, time)
+    create_sond_competition(LATIN, TEST, time)
+    if form.aspiranten_junioren_ballroom.data:
+        create_sond_competition(BALLROOM, ASPIRANTEN_JUNIOREN, time)
+    if form.nieuwelingen_junioren_ballroom.data:
+        create_sond_competition(BALLROOM, NIEUWELINGEN_JUNIOREN, time)
+    if form.d_junioren_ballroom.data:
+        create_sond_competition(BALLROOM, D_KLASSE_JUNIOREN, time)
+    if form.c_junioren_ballroom.data:
+        create_sond_competition(BALLROOM, C_KLASSE_JUNIOREN, time)
+    if form.b_junioren_ballroom.data:
+        create_sond_competition(BALLROOM, B_KLASSE_JUNIOREN, time)
+    if form.a_junioren_ballroom.data:
+        create_sond_competition(BALLROOM, A_KLASSE_JUNIOREN, time)
+    if form.open_junioren_ballroom.data:
+        create_sond_competition(BALLROOM, OPEN_KLASSE_JUNIOREN, time)
+    if form.aspiranten_senioren_ballroom.data:
+        create_sond_competition(BALLROOM, ASPIRANTEN_SENIOREN, time)
+    if form.nieuwelingen_senioren_ballroom.data:
+        create_sond_competition(BALLROOM, NIEUWELINGEN_SENIOREN, time)
+    if form.d_senioren_ballroom.data:
+        create_sond_competition(BALLROOM, D_KLASSE_SENIOREN, time)
+    if form.c_senioren_ballroom.data:
+        create_sond_competition(BALLROOM, C_KLASSE_SENIOREN, time)
+    if form.b_senioren_ballroom.data:
+        create_sond_competition(BALLROOM, B_KLASSE_SENIOREN, time)
+    if form.a_senioren_ballroom.data:
+        create_sond_competition(BALLROOM, A_KLASSE_SENIOREN, time)
+    if form.open_senioren_ballroom.data:
+        create_sond_competition(BALLROOM, OPEN_KLASSE_SENIOREN, time)
+    if form.aspiranten_junioren_latin.data:
+        create_sond_competition(LATIN, ASPIRANTEN_JUNIOREN, time)
+    if form.nieuwelingen_junioren_latin.data:
+        create_sond_competition(LATIN, NIEUWELINGEN_JUNIOREN, time)
+    if form.d_junioren_latin.data:
+        create_sond_competition(LATIN, D_KLASSE_JUNIOREN, time)
+    if form.c_junioren_latin.data:
+        create_sond_competition(LATIN, C_KLASSE_JUNIOREN, time)
+    if form.b_junioren_latin.data:
+        create_sond_competition(LATIN, B_KLASSE_JUNIOREN, time)
+    if form.a_junioren_latin.data:
+        create_sond_competition(LATIN, A_KLASSE_JUNIOREN, time)
+    if form.open_junioren_latin.data:
+        create_sond_competition(LATIN, OPEN_KLASSE_JUNIOREN, time)
+    if form.aspiranten_senioren_latin.data:
+        create_sond_competition(LATIN, ASPIRANTEN_SENIOREN, time)
+    if form.nieuwelingen_senioren_latin.data:
+        create_sond_competition(LATIN, NIEUWELINGEN_SENIOREN, time)
+    if form.d_senioren_latin.data:
+        create_sond_competition(LATIN, D_KLASSE_SENIOREN, time)
+    if form.c_senioren_latin.data:
+        create_sond_competition(LATIN, C_KLASSE_SENIOREN, time)
+    if form.b_senioren_latin.data:
+        create_sond_competition(LATIN, B_KLASSE_SENIOREN, time)
+    if form.a_senioren_latin.data:
+        create_sond_competition(LATIN, A_KLASSE_SENIOREN, time)
+    if form.open_senioren_latin.data:
+        create_sond_competition(LATIN, OPEN_KLASSE_SENIOREN, time)
+
+
+def create_sond_competition(disc, d_class, start_time):
+    if disc == LATIN:
+        start_time = start_time + timedelta(days=1)
+    if d_class in SOND_SENIOREN:
+        start_time = start_time + timedelta(hours=6)
+    time = start_time
+    c = Competition()
+    c.discipline = Discipline.query.filter(Discipline.name == disc).first()
+    c.dancing_class = DancingClass.query.filter(DancingClass.name == d_class).first()
+    c.mode = CompetitionMode.single_partner
+    floors = 1
+    if d_class == TEST:
+        time = time + timedelta(hours=-1)
+    if d_class == ASPIRANTEN_JUNIOREN or d_class == ASPIRANTEN_SENIOREN:
+        time = time + timedelta(minutes=30)
+    if d_class == NIEUWELINGEN_JUNIOREN or d_class == NIEUWELINGEN_SENIOREN:
+        time = time + timedelta(hours=1)
+    if d_class == D_KLASSE_JUNIOREN or d_class == D_KLASSE_SENIOREN:
+        time = time + timedelta(hours=1) + timedelta(minutes=30)
+    if d_class == C_KLASSE_JUNIOREN or d_class == C_KLASSE_SENIOREN:
+        time = time + timedelta(hours=2)
+    if d_class == B_KLASSE_JUNIOREN or d_class == B_KLASSE_SENIOREN:
+        time = time + timedelta(hours=2) + timedelta(minutes=30)
+    if d_class == A_KLASSE_JUNIOREN or d_class == A_KLASSE_SENIOREN:
+        time = time + timedelta(hours=3)
+    if d_class == OPEN_KLASSE_JUNIOREN or d_class == OPEN_KLASSE_SENIOREN:
+        time = time + timedelta(hours=3) + timedelta(minutes=30)
+    c.floors = floors
+    c.when = time
+    c.event = g.event
+    if d_class in BREITENSPORT_COMPETITIONS:
+        c.qualification = Competition.query.join(DancingClass, Discipline) \
             .filter(DancingClass.name == BREITENSPORT_QUALIFICATION, Discipline.name == disc).first()
     db.session.commit()
 
@@ -694,7 +801,7 @@ def available_couples():
                         check_follow = Dancer.query.filter(Dancer.name == d[1], Dancer.role == FOLLOW).first()
                         check_competition = Competition.query.join(Discipline, DancingClass)\
                             .filter(Discipline.name == d[2], DancingClass.name == d[3]).first()
-                        if check_lead is not None and check_follow is not None and check_competition is not None:
+                        if check_lead is not None and check_follow is not None:
                             couple = Couple.query.filter(Couple.lead == check_lead, Couple.follow == check_follow)\
                                 .first()
                             if couple is None:
@@ -703,7 +810,8 @@ def available_couples():
                                 couple.follow = check_follow
                                 couple.number = check_lead.number
                             counter += 1
-                            couple.competitions.append(check_competition)
+                            if check_competition is not None:
+                                couple.competitions.append(check_competition)
                             db.session.add(couple)
                 db.session.commit()
                 if counter > 0:

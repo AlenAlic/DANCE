@@ -70,7 +70,9 @@ class ImportDancersForm(FlaskForm):
 class ImportCouplesForm(ImportDancersForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.import_string.label.text = "Import from CSV string (name_lead,name_follow,discipline,class)"
+        self.import_string.label.text = "Import from CSV string (name_lead,name_follow,discipline,class). " \
+                                        "You can also omit the discipline and class (the commas must still be there!) "\
+                                        "to just create a couple, without adding them to a competition"
 
 
 class CoupleForm(FlaskForm):
@@ -251,6 +253,34 @@ class DefaultCompetitionForm(FlaskForm):
     champions = BooleanField(CHAMPIONS)
     closed = BooleanField(CLOSED)
     open_class = BooleanField(OPEN_CLASS)
+    aspiranten_junioren_ballroom = BooleanField(ASPIRANTEN_JUNIOREN + " " + BALLROOM)
+    nieuwelingen_junioren_ballroom = BooleanField(NIEUWELINGEN_JUNIOREN + " " + BALLROOM)
+    d_junioren_ballroom = BooleanField(D_KLASSE_JUNIOREN + " " + BALLROOM)
+    c_junioren_ballroom = BooleanField(C_KLASSE_JUNIOREN + " " + BALLROOM)
+    b_junioren_ballroom = BooleanField(B_KLASSE_JUNIOREN + " " + BALLROOM)
+    a_junioren_ballroom = BooleanField(A_KLASSE_JUNIOREN + " " + BALLROOM)
+    open_junioren_ballroom = BooleanField(OPEN_KLASSE_JUNIOREN + " " + BALLROOM)
+    aspiranten_junioren_latin = BooleanField(ASPIRANTEN_JUNIOREN + " " + LATIN)
+    nieuwelingen_junioren_latin = BooleanField(NIEUWELINGEN_JUNIOREN + " " + LATIN)
+    d_junioren_latin = BooleanField(D_KLASSE_JUNIOREN + " " + LATIN)
+    c_junioren_latin = BooleanField(C_KLASSE_JUNIOREN + " " + LATIN)
+    b_junioren_latin = BooleanField(B_KLASSE_JUNIOREN + " " + LATIN)
+    a_junioren_latin = BooleanField(A_KLASSE_JUNIOREN + " " + LATIN)
+    open_junioren_latin = BooleanField(OPEN_KLASSE_JUNIOREN + " " + LATIN)
+    aspiranten_senioren_ballroom = BooleanField(ASPIRANTEN_SENIOREN + " " + BALLROOM)
+    nieuwelingen_senioren_ballroom = BooleanField(NIEUWELINGEN_SENIOREN + " " + BALLROOM)
+    d_senioren_ballroom = BooleanField(D_KLASSE_SENIOREN + " " + BALLROOM)
+    c_senioren_ballroom = BooleanField(C_KLASSE_SENIOREN + " " + BALLROOM)
+    b_senioren_ballroom = BooleanField(B_KLASSE_SENIOREN + " " + BALLROOM)
+    a_senioren_ballroom = BooleanField(A_KLASSE_SENIOREN + " " + BALLROOM)
+    open_senioren_ballroom = BooleanField(OPEN_KLASSE_SENIOREN + " " + BALLROOM)
+    aspiranten_senioren_latin = BooleanField(ASPIRANTEN_SENIOREN + " " + LATIN)
+    nieuwelingen_senioren_latin = BooleanField(NIEUWELINGEN_SENIOREN + " " + LATIN)
+    d_senioren_latin = BooleanField(D_KLASSE_SENIOREN + " " + LATIN)
+    c_senioren_latin = BooleanField(C_KLASSE_SENIOREN + " " + LATIN)
+    b_senioren_latin = BooleanField(B_KLASSE_SENIOREN + " " + LATIN)
+    a_senioren_latin = BooleanField(A_KLASSE_SENIOREN + " " + LATIN)
+    open_senioren_latin = BooleanField(OPEN_KLASSE_SENIOREN + " " + LATIN)
     when = DateField('Start date', default=dt.datetime.now(), description='Start date of the event (the Saturday)',
                      render_kw={"type": "date"})
     default_submit = SubmitField('Create default competitions')

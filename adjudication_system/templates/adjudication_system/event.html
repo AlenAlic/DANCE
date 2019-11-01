@@ -14,21 +14,57 @@
 {% else %}
 {% if g.event.competitions|length == 0 %}
 <h3 class="mt-3">Create default competitions</h3>
-{% if not config.get(g.data.ODK) %}
+{% if not config.get(g.data.ODK) and not config.get(g.data.SOND) %}
 <p>Choose which classes to create from the options below. If you're not sure if the default values will work the event, you can use the form below to create everything manually.</p>
 {% endif %}
 <p><b>Warning!</b> Doing this will delete any previously created dances, disciplines, and classes.</p>
 <form  method="POST" enctype="multipart/form-data" novalidate>
     {{ default_form.hidden_tag() }}
-    {% if not config.get(g.data.ODK) %}
-    <label style="display:block;">Competitions to create:</label>
-    {{ inline_wtf.form_field(default_form.beginners) }}
-    {{ inline_wtf.form_field(default_form.amateurs) }}
-    {{ inline_wtf.form_field(default_form.professionals) }}
-    {{ inline_wtf.form_field(default_form.masters) }}
-    {{ inline_wtf.form_field(default_form.champions) }}
-    {{ inline_wtf.form_field(default_form.closed) }}
-    {{ inline_wtf.form_field(default_form.open_class) }}
+    {% if config.get(g.data.SOND) %}
+        <label style="display:block;">Competitions to create:</label>
+        <h6>{{g.data.BALLROOM}}</h6>
+        <div><i>Junioren</i></div>
+        {{ inline_wtf.form_field(default_form.aspiranten_junioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.nieuwelingen_junioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.d_junioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.c_junioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.b_junioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.a_junioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.open_junioren_ballroom) }}
+        <div><i>Senioren</i></div>
+        {{ inline_wtf.form_field(default_form.aspiranten_senioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.nieuwelingen_senioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.d_senioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.c_senioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.b_senioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.a_senioren_ballroom) }}
+        {{ inline_wtf.form_field(default_form.open_senioren_ballroom) }}
+        <h6 class="mt-3">{{g.data.LATIN}}</h6>
+        <div><i>Junioren</i></div>
+        {{ inline_wtf.form_field(default_form.aspiranten_junioren_latin) }}
+        {{ inline_wtf.form_field(default_form.nieuwelingen_junioren_latin) }}
+        {{ inline_wtf.form_field(default_form.d_junioren_latin) }}
+        {{ inline_wtf.form_field(default_form.c_junioren_latin) }}
+        {{ inline_wtf.form_field(default_form.b_junioren_latin) }}
+        {{ inline_wtf.form_field(default_form.a_junioren_latin) }}
+        {{ inline_wtf.form_field(default_form.open_junioren_latin) }}
+        <div><i>Senioren</i></div>
+        {{ inline_wtf.form_field(default_form.aspiranten_senioren_latin) }}
+        {{ inline_wtf.form_field(default_form.nieuwelingen_senioren_latin) }}
+        {{ inline_wtf.form_field(default_form.d_senioren_latin) }}
+        {{ inline_wtf.form_field(default_form.c_senioren_latin) }}
+        {{ inline_wtf.form_field(default_form.b_senioren_latin) }}
+        {{ inline_wtf.form_field(default_form.a_senioren_latin) }}
+        {{ inline_wtf.form_field(default_form.open_senioren_latin) }}
+    {% elif not config.get(g.data.ODK) %}
+        <label style="display:block;">Competitions to create:</label>
+        {{ inline_wtf.form_field(default_form.beginners) }}
+        {{ inline_wtf.form_field(default_form.amateurs) }}
+        {{ inline_wtf.form_field(default_form.professionals) }}
+        {{ inline_wtf.form_field(default_form.masters) }}
+        {{ inline_wtf.form_field(default_form.champions) }}
+        {{ inline_wtf.form_field(default_form.closed) }}
+        {{ inline_wtf.form_field(default_form.open_class) }}
     {% endif %}
     <div class="col-12 px-0 mt-3">
         {{ inline_wtf.form_field(default_form.when) }}
