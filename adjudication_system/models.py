@@ -220,6 +220,7 @@ class Competition(db.Model):
     qualification_id = db.Column(db.Integer, db.ForeignKey('competition.competition_id',
                                                            onupdate="CASCADE", ondelete="CASCADE"))
     qualifications = db.relationship("Competition", backref=db.backref('qualification', remote_side=[competition_id]))
+    heat_list = db.Column(db.Text(), nullable=True, default=None)
 
     def __repr__(self):
         return '{disc} {cls}'.format(cls=self.dancing_class, disc=self.discipline)
@@ -332,6 +333,28 @@ class Competition(db.Model):
                  "completed": r.is_completed(),
                  "mode": r.competition.mode.name
                  } for r in self.rounds]
+
+    def last_round_with_heat_list_published(self):
+        rounds = [r for r in self.rounds if r.heat_list_published and r.type != RoundType.final]
+        if len(rounds) > 0:
+            return max(rounds, key=lambda x: x.round_id)
+        return None
+
+    def has_completed_final(self):
+        rounds = [r for r in self.rounds if r.type == RoundType.final]
+        if len(rounds) > 0:
+            for r in rounds:
+                return r.final_completed()
+        return False
+
+    def is_quali_competition(self):
+        rounds = [r for r in self.rounds if r.type == RoundType.qualification]
+        if len(rounds) == 1:
+            return True
+        return False
+
+    def cache(self):
+        return RESULTS_CACHE.format(self.competition_id)
 
 
 def create_couples_list(couples=None, leads=None, follows=None):
@@ -525,9 +548,9 @@ class Dancer(db.Model):
 
     def set_competitions(self, comps):
         if self.role == LEAD:
-            self.competitions_lead = comps
+            self.competitions_lead = [c for c in self.competitions_lead if c.has_rounds()] + comps
         else:
-            self.competitions_follow = comps
+            self.competitions_follow = [c for c in self.competitions_follow if c.has_rounds()] + comps
 
 
 class Couple(db.Model):
@@ -592,6 +615,7 @@ class Round(db.Model):
     min_marks = db.Column(db.Integer, default=1)
     max_marks = db.Column(db.Integer, default=1)
     is_active = db.Column(db.Boolean, default=False)
+    heat_list_published = db.Column(db.Boolean, default=False)
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.competition_id',
                                                          onupdate="CASCADE", ondelete="CASCADE"))
     competition = db.relationship("Competition", back_populates="rounds")
@@ -607,6 +631,11 @@ class Round(db.Model):
 
     def short_name(self):
         return ROUND_SHORT_NAMES[self.type]
+
+    def is_published(self):
+        if self.competition.heat_list is None:
+            return False
+        return self.__repr__() in self.competition.heat_list
 
     def is_completed(self):
         if not self.is_final():

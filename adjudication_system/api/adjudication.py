@@ -51,6 +51,31 @@ def final_placing_final_placing(final_placing_id, place):
     placing = FinalPlacing.query.get_or_404(final_placing_id)
     if request.method == "PATCH":
         if placing.round.is_dance_active(placing.dance):
-            placing.final_placing = place
-            db.session.commit()
+            placings = FinalPlacing.query.filter(FinalPlacing.adjudicator == placing.adjudicator,
+                                                 FinalPlacing.round == placing.round,
+                                                 FinalPlacing.dance == placing.dance).all()
+            if place < placing.final_placing:
+                placing.final_placing = place
+                if place > 0:
+                    place_to_update = place
+                    placings_to_update = [p for p in placings if p.final_placing == place_to_update
+                                          and p.couple != placing.couple]
+                    while len(placings_to_update) > 0 and place_to_update != 0:
+                        place_to_update = (place_to_update + 1) % (len(placing.round.couples) + 1)
+                        placings_to_update[0].final_placing = place_to_update
+                        placings_to_update = [p for p in placings if p.final_placing == place_to_update
+                                              and p.couple != placings_to_update[0].couple]
+                db.session.commit()
+            elif place > placing.final_placing:
+                placing.final_placing = place
+                if place > 0:
+                    place_to_update = place
+                    placings_to_update = [p for p in placings if p.final_placing == place_to_update
+                                          and p.couple != placing.couple]
+                    while len(placings_to_update) > 0 and place_to_update != 0:
+                        place_to_update = (place_to_update - 1) % (len(placing.round.couples) + 1)
+                        placings_to_update[0].final_placing = place_to_update
+                        placings_to_update = [p for p in placings if p.final_placing == place_to_update
+                                              and p.couple != placings_to_update[0].couple]
+                db.session.commit()
     return jsonify(placing.to_dict())

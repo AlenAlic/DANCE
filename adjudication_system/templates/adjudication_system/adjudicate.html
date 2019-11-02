@@ -42,7 +42,7 @@ onload="onStart()"
 {% endblock %}
 
 {% block navbar %}
-<nav id="nav-bar" class="navbar sticky-top navbar-expand navbar-light adjudicator-nav-bar px-1" style="background-color:{% if not dancing_round.is_final() %}var(--secondary){% else %}{% if dancing_round.adjudicator_dance_placed(current_user.adjudicator, dance)|length == dancing_round.couples|length %}var(--success){% else %}var(--danger){% endif %}{% endif %};">
+<nav id="nav-bar" class="navbar sticky-top navbar-expand navbar-light adjudicator-nav-bar px-1" style="background:{% if not dancing_round.is_final() %}var(--secondary){% else %}{% if dancing_round.adjudicator_dance_placed(current_user.adjudicator, dance)|length == dancing_round.couples|length %}var(--success){% else %}var(--danger){% endif %}{% endif %};">
     <div class="adjudicator-status-bar">
         <div class="adjudicator-status-bar-cell-side">
             <div>
@@ -119,7 +119,7 @@ onload="onStart()"
 <script>
 var wait = ms => new Promise((r, j) => setTimeout(r, ms))
 onStart = () => {
-    fetch("/adjudication_system/api/round/" + {{dancing_round.round_id}} + "/adjudicator/" + {{current_user.adjudicator.adjudicator_id}} + "/dance/" + {{dance.dance_id}}, {method: "GET"})
+    fetch("/adjudication_system/api/round/" + {{dancing_round.round_id}} + "/adjudicator/" + {{current_user.adjudicator.adjudicator_id}} + "/dance/" + {{dance.dance_id}}, {method: "GET", credentials: 'same-origin'})
     .then(function(response) {return response.json();})
     .then(function(result) {updatePage(result);} )
     .catch(function(error) {console.log('Error: \n', error); });
@@ -127,14 +127,14 @@ onStart = () => {
 updateNotesAPI = (id) => {
     let cell = document.getElementById(id)
     apiPending(cell)
-    fetch("/adjudication_system/api/mark/" + cell.id + "/notes", {method: "PATCH"})
+    fetch("/adjudication_system/api/mark/" + cell.id + "/notes", {method: "PATCH", credentials: 'same-origin'})
     .then(function(response) {return response.json();})
     .then(function(result) {updateCross(cell, result);} )
     .catch(function(error) {console.log('Error: \n', error); });
 }
 updateCrossAPI = (cell) => {
     apiPending(cell)
-    fetch("/adjudication_system/api/mark/" + cell.id + "/mark", {method: "PATCH"})
+    fetch("/adjudication_system/api/mark/" + cell.id + "/mark", {method: "PATCH", credentials: 'same-origin'})
     .then(function(response) {return response.json();})
     .then(function(result) {updateCross(cell, result);} )
     .catch(function(error) {console.log('Error: \n', error); });
@@ -186,7 +186,7 @@ apiPending = elem => {
         <div data-toggle="buttons">
         {% for placing in dancing_round.final_placings|sort(attribute='couple.number') %}
             {% if placing.dance == dance and placing.adjudicator == current_user.adjudicator %}
-            <label class="btn btn-{% if placing.final_placing > 0 %}primary{% else %}outline-primary{% endif %} final-placing-block" for="{{placing.final_placing_id}}">
+            <label class="btn btn-outline-primary final-placing-block" for="{{placing.final_placing_id}}">
                 <input {% if not dancing_round.is_dance_active(dance) %}disabled{% endif %} type="radio" name="placings" style="display:none;" id="{{placing.final_placing_id}}">{{placing.couple.number}}
             </label>
             {% endif %}
@@ -208,7 +208,7 @@ apiPending = elem => {
     <div class="final-column-side">
         <span style="margin-left:auto;">
             {% for i in range(dancing_round.couples|length) %}
-            <button class="btn btn-secondary mb-2 final-placing-block" {% if dancing_round.is_place_given(current_user.adjudicator, dance, loop.index) or not dancing_round.is_dance_active(dance) %}disabled{% endif %} value="{{loop.index}}" onclick="updatePlacingAPI(this)">{{loop.index}}</button>
+            <button class="btn btn-secondary mb-2 final-placing-block" {% if not dancing_round.is_dance_active(dance) %}disabled{% endif %} value="{{loop.index}}" onclick="updatePlacingAPI(this)">{{loop.index}}</button>
             {% endfor %}
             <button class="btn btn-outline-danger mb-2 final-placing-block" {% if not dancing_round.is_dance_active(dance) %}disabled{% endif %} value="0" onclick="updatePlacingAPI(this)">X</button>
         </span>
@@ -218,7 +218,7 @@ apiPending = elem => {
 onStart = () => {}
 updatePlacingAPI = elem => {
     let place = document.querySelector('input[name="placings"]:checked')
-    fetch("/adjudication_system/api/final_placing/" + place.id + "/final_placing/" + elem.value, {method: "PATCH"})
+    fetch("/adjudication_system/api/final_placing/" + place.id + "/final_placing/" + elem.value, {method: "PATCH", credentials: 'same-origin'})
     .then(function(response) {return response.json();})
     .then(function(result) {location.reload(true);} )
     .catch(function(error) {console.log('Error: \n', error); });

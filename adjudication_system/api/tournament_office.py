@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 from flask_login import login_required
 from adjudication_system import db
 from adjudication_system.models import Round, DanceActive, requires_access_level

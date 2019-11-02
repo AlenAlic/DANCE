@@ -5,6 +5,7 @@ from flask_login import LoginManager, current_user, AnonymousUserMixin
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
 from flask_bootstrap import Bootstrap
+from flask_caching import Cache
 from wtforms import PasswordField
 import adjudication_system.values as values
 
@@ -23,6 +24,7 @@ migrate = Migrate()
 login = LoginManager()
 admin = Admin(template_mode='bootstrap3', index_view=MyAdminIndexView())
 bootstrap = Bootstrap()
+cache = Cache()
 
 
 class AdjudicatorSystemView(ModelView):
@@ -100,6 +102,7 @@ def create_app():
     admin.add_view(AdjudicatorSystemView(FinalPlacing, db.session))
     admin.add_view(AdjudicatorSystemView(CouplePresent, db.session))
     admin.add_view(AdjudicatorSystemView(RoundResult, db.session))
+    cache.init_app(app)
 
     # Shell command for creating tournament office (admin) account, a floor manager account, and a presenter account
     def create_tournament_office(tournament_office_password, floor_manager_password, presenter_password):

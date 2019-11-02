@@ -1,20 +1,21 @@
 from flask import render_template, redirect, url_for, flash, request, g, Markup, current_app
 from flask_login import login_required, current_user
-from adjudication_system import db
+from adjudication_system import db, cache
 from adjudication_system.adjudication_system import bp
 from adjudication_system.adjudication_system.forms import SplitForm, EventForm, CompetitionForm, \
     CreateFirstRoundForm, DefaultCompetitionForm, ConfigureNextRoundForm, DanceForm, DisciplineForm, DancingClassForm, \
     PrintReportsForm, CoupleForm, EditCoupleForm, EditDancerForm, CreateAdjudicatorForm, DancerForm, ImportDancersForm,\
-    ImportCouplesForm
+    ImportCouplesForm, ChooseHeatForm, ChooseCoupleForm, MoveHeatForm, AddCoupleForm, RemoveCoupleForm
 from adjudication_system.models import User, Event, Competition, DancingClass, Discipline, Dance, Round, \
     RoundType, Adjudicator, Couple, CouplePresent, RoundResult, DanceActive, Dancer, CompetitionMode, \
-    create_couples_list, ADJUDICATOR_SYSTEM_TABLES, requires_access_level, requires_adjudicator_access_level
+    create_couples_list, ADJUDICATOR_SYSTEM_TABLES, requires_access_level, requires_adjudicator_access_level, Heat, Mark
 from itertools import combinations
 from adjudication_system.values import *
 from datetime import datetime, timedelta
 import statistics
 from sqlalchemy import or_
 from adjudication_system.skating import generate_placings
+from werkzeug.exceptions import BadRequestKeyError
 
 
 def reset():
@@ -1018,32 +1019,72 @@ def progress():
 def split_breitensport(dancing_round, chosen_split):
     competitions = [c for c in dancing_round.competition.qualifications]
     competitions.sort(key=lambda comp: comp.when)
-    for idx, dc in enumerate(chosen_split):
-        competitions[idx].couples.extend(chosen_split[idx])
-        db.session.commit()
+    if dancing_round.competition.mode == CompetitionMode.change_per_dance:
+        for idx, dc in enumerate(chosen_split):
+            competitions[idx].leads.extend([d["dancer"] for d in chosen_split[idx] if d["lead"]])
+            competitions[idx].follows.extend([d["dancer"] for d in chosen_split[idx] if d["follow"]])
+            db.session.commit()
+    else:
+        for idx, dc in enumerate(chosen_split):
+            competitions[idx].couples.extend(chosen_split[idx])
+            db.session.commit()
 
 
 # noinspection PyTypeChecker
 def split_couples_into_competitions(dancing_round):
     num_comps = len(dancing_round.competition.qualifications)
-    round_result_list = [r.marks for r in dancing_round.round_results]
-    unique_results = list(set(round_result_list))
-    unique_results.sort()
-    combs = []
-    for c in combinations(range(1, len(unique_results)), num_comps - 1):
-        combs.append(split_list(unique_results, list(c)))
-    splittings = [[[] for _ in range(num_comps)] for _ in combs]
-    for i in range(len(combs)):
-        for j in range(num_comps):
-            for r in dancing_round.round_results:
-                if r.marks in combs[i][j]:
-                    splittings[i][j].append(r.couple)
-    splittings.sort(key=lambda x: statistics.stdev([len(s) for s in x]))
-    splitting_strings = [' / '.join([str(st) for st in s]) for s in [[len(l) for l in sp] for sp in splittings]]
-    splitting_results = {}
-    for i in range(len(combs)):
-        splitting_results.update({splitting_strings[i]: splittings[i]})
-    return splitting_results
+    if dancing_round.competition.mode == CompetitionMode.change_per_dance:
+        dancers = dancing_round.change_per_dance_dancers_rows()
+        round_result_list = [r["crosses"] for r in dancers]
+        unique_results = list(set(round_result_list))
+        unique_results.sort()
+        possible_results = []
+        for res in unique_results:
+            temp_dancers = [d for d in dancers if d["crosses"] <= res]
+            leads = [d for d in temp_dancers if d["lead"]]
+            follows = [d for d in temp_dancers if d["follow"]]
+            if len(leads) == len(follows):
+                possible_results.append(res)
+        possible_results.sort()
+        combs = []
+        for c in combinations(range(1, len(unique_results)), num_comps - 1):
+            combs.append(split_list(unique_results, list(c)))
+        possible_combs = []
+        for c in combs:
+            splits = [max(l) for l in c]
+            if all([l in possible_results for l in splits]):
+                possible_combs.append(c)
+        splittings = [[[] for _ in range(num_comps)] for _ in possible_combs]
+        for i in range(len(possible_combs)):
+            for j in range(num_comps):
+                for d in dancers:
+                    if d["crosses"] in possible_combs[i][j]:
+                        splittings[i][j].append(d)
+        splittings.sort(key=lambda x: statistics.stdev([len(s) for s in x]))
+        splitting_strings = [' / '.join([str(st) for st in s]) for s in [[len(l) for l in sp] for sp in splittings]]
+        splitting_results = {}
+        for i in range(len(possible_combs)):
+            splitting_results.update({splitting_strings[i]: splittings[i]})
+        return splitting_results
+    else:
+        round_result_list = [r.marks for r in dancing_round.round_results]
+        unique_results = list(set(round_result_list))
+        unique_results.sort()
+        combs = []
+        for c in combinations(range(1, len(unique_results)), num_comps - 1):
+            combs.append(split_list(unique_results, list(c)))
+        splittings = [[[] for _ in range(num_comps)] for _ in combs]
+        for i in range(len(combs)):
+            for j in range(num_comps):
+                for r in dancing_round.round_results:
+                    if r.marks in combs[i][j]:
+                        splittings[i][j].append(r.couple)
+        splittings.sort(key=lambda x: statistics.stdev([len(s) for s in x]))
+        splitting_strings = [' / '.join([str(st) for st in s]) for s in [[len(l) for l in sp] for sp in splittings]]
+        splitting_results = {}
+        for i in range(len(combs)):
+            splitting_results.update({splitting_strings[i]: splittings[i]})
+        return splitting_results
 
 
 def split_list(l, indices):
@@ -1239,6 +1280,129 @@ def adjudication():
     return render_template('adjudication_system/adjudication.html', dancing_round=dancing_round, dance=dance)
 
 
+@bp.route('/change_heat_couple', methods=['GET', 'POST'], defaults={'heat_id': None, 'couple_id': None})
+@bp.route('/change_heat_couple/<int:heat_id>', methods=['GET', 'POST'], defaults={'couple_id': None})
+@bp.route('/change_heat_couple/<int:heat_id>/<int:couple_id>', methods=['GET', 'POST'])
+@login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
+def change_heat_couple(heat_id, couple_id):
+    dancing_round_id = request.args.get('round_id', 0, type=int)
+    dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
+    if dancing_round is None:
+        return redirect(url_for("adjudication_system.event"))
+    dance_id = request.args.get('dance_id', 0, type=int)
+    if dance_id == 0:
+        if dancing_round.has_dances():
+            return redirect(url_for('adjudication_system.change_heat_couple', round_id=dancing_round.round_id,
+                                    dance_id=dancing_round.first_dance().dance_id))
+        else:
+            flash('Please configure the dancing round first.', "alert-warning")
+            return redirect(url_for('adjudication_system.progress', round_id=dancing_round.round_id))
+    elif not dancing_round.has_dance(dance_id):
+        return redirect(url_for('adjudication_system.change_heat_couple', round_id=dancing_round.round_id,
+                                dance_id=dancing_round.first_dance().dance_id))
+    dance = Dance.query.get(dance_id)
+    heat_form = ChooseHeatForm(dancing_round, dance)
+    heat = Heat.query.filter(Heat.heat_id == heat_id).first() if heat_id is not None else None
+    couple_form = ChooseCoupleForm(heat)
+    couple = Couple.query.filter(Couple.couple_id == couple_id).first() if couple_id is not None else None
+    move_heat_form = MoveHeatForm(dancing_round, dance, heat)
+    if request.method == "POST":
+        if heat_form.heat_submit.name in request.form:
+            if heat_form.validate_on_submit():
+                heat = heat_form.heat.data
+                return redirect(url_for('adjudication_system.change_heat_couple', round_id=dancing_round.round_id,
+                                        dance_id=dance.dance_id, heat_id=heat.heat_id))
+        if couple_form.couple_submit.name in request.form:
+            if couple_form.validate_on_submit():
+                couple = couple_form.couple.data
+                return redirect(url_for('adjudication_system.change_heat_couple', round_id=dancing_round.round_id,
+                                        dance_id=dance.dance_id, heat_id=heat.heat_id,
+                                        couple_id=couple.couple_id))
+        if move_heat_form.move_heat_submit.name in request.form:
+            if move_heat_form.validate_on_submit():
+                move_to_heat = move_heat_form.heat.data
+                marks = Mark.query.filter(Mark.couple == couple, Mark.heat == heat).all()
+                for mark in marks:
+                    mark.heat = move_to_heat
+                present = CouplePresent.query.filter(CouplePresent.couple == couple, CouplePresent.heat == heat).first()
+                present.heat = move_to_heat
+                heat.couples.remove(couple)
+                move_to_heat.couples.append(couple)
+                db.session.commit()
+                flash(f"Moved {couple} from {heat} to {move_to_heat}.")
+                return redirect(url_for('adjudication_system.change_heat_couple', round_id=dancing_round.round_id,
+                                        dance_id=dance.dance_id))
+    return render_template('adjudication_system/change_heat_couple.html', dancing_round=dancing_round, dance=dance,
+                           heat_form=heat_form, heat=heat, couple_form=couple_form, couple=couple,
+                           move_heat_form=move_heat_form)
+
+
+@bp.route('/change_couple', methods=['GET', 'POST'])
+@login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
+def change_couple():
+    dancing_round_id = request.args.get('round_id', 0, type=int)
+    dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
+    if dancing_round is None:
+        return redirect(url_for("adjudication_system.event"))
+    dance_id = request.args.get('dance_id', 0, type=int)
+    if dance_id == 0:
+        if dancing_round.has_dances():
+            return redirect(url_for('adjudication_system.change_couple', round_id=dancing_round.round_id,
+                                    dance_id=dancing_round.first_dance().dance_id))
+        else:
+            flash('Please configure the dancing round first.', "alert-warning")
+            return redirect(url_for('adjudication_system.progress', round_id=dancing_round.round_id))
+    elif not dancing_round.has_dance(dance_id):
+        return redirect(url_for('adjudication_system.change_couple', round_id=dancing_round.round_id,
+                                dance_id=dancing_round.first_dance().dance_id))
+    if not dancing_round.competition.mode == CompetitionMode.single_partner:
+        flash(f'Can only edit couples from {CompetitionMode.single_partner.value}.', "alert-warning")
+        return redirect(url_for('adjudication_system.progress', round_id=dancing_round.round_id))
+    add_form = AddCoupleForm(dancing_round.competition)
+    remove_form = RemoveCoupleForm(dancing_round.competition)
+    if request.method == "POST":
+        if add_form.add_couple_submit.name in request.form:
+            if add_form.validate_on_submit():
+                couple = add_form.couple.data
+                dancing_round.competition.couples.append(couple)
+                dancing_round.couples.append(couple)
+                for dance in dancing_round.dances:
+                    heats = sorted([h for h in dancing_round.heats if h.dance == dance], key=lambda x: len(x.couples))
+                    heat = heats[0]
+                    cp = CouplePresent()
+                    cp.couple = couple
+                    cp.heat = heat
+                    heat.couples.append(couple)
+                    for adj in dancing_round.competition.adjudicators:
+                        m = Mark()
+                        m.adjudicator = adj
+                        m.couple = couple
+                        m.heat = heat
+                db.session.commit()
+                flash(f"Added {couple} to {dancing_round.competition}.")
+                return redirect(url_for('adjudication_system.progress', round_id=dancing_round.round_id))
+        if remove_form.remove_couple_submit.name in request.form:
+            if remove_form.validate_on_submit():
+                couple = remove_form.couple.data
+                dancing_round.competition.couples.remove(couple)
+                dancing_round.couples.remove(couple)
+                cp = CouplePresent.query.filter(CouplePresent.heat_id.in_([h.heat_id for h in dancing_round.heats]),
+                                                CouplePresent.couple == couple).all()
+                for c in cp:
+                    db.session.delete(c)
+                marks = Mark.query.filter(Mark.heat_id.in_([h.heat_id for h in dancing_round.heats]),
+                                          Mark.couple == couple).all()
+                for m in marks:
+                    db.session.delete(m)
+                db.session.commit()
+                flash(f"Removed {couple} from {dancing_round.competition}.")
+                return redirect(url_for('adjudication_system.progress', round_id=dancing_round.round_id))
+    return render_template('adjudication_system/change_couple.html', dancing_round=dancing_round,
+                           add_form=add_form, remove_form=remove_form)
+
+
 @bp.route('/final_result', methods=['GET'])
 @login_required
 @requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
@@ -1249,6 +1413,56 @@ def final_result():
         return redirect(url_for("adjudication_system.event"))
     skating = dancing_round.skating_summary()
     return render_template('adjudication_system/final_result.html', dancing_round=dancing_round, skating=skating)
+
+
+@bp.route('/publish_heat_list', methods=['GET', 'POST'])
+@login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
+def publish_heat_list():
+    dancing_round_id = request.args.get('round_id', 0, type=int)
+    dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
+    if dancing_round is None:
+        return redirect(url_for("adjudication_system.event"))
+    if request.method == "POST":
+        form = request.form["list"]
+        if form == "publish":
+            dancing_round.heat_list_published = True
+            flash('Published heat list.')
+        if form == "hide":
+            dancing_round.heat_list_published = False
+            flash('Hidden heat list from outside world.')
+        db.session.commit()
+        return redirect(url_for("adjudication_system.publish_heat_list", round_id=dancing_round.round_id))
+    return render_template('adjudication_system/publish_heat_list.html', dancing_round=dancing_round)
+
+
+@bp.route('/publish_final_results', methods=['GET', 'POST'])
+@login_required
+@requires_access_level([ACCESS[TOURNAMENT_OFFICE_MANAGER]])
+def publish_final_results():
+    competitions = Competition.query.order_by(Competition.when).all()
+    competitions = [c for c in competitions if c.dancing_class.name != TEST]
+    if len(competitions) == 0:
+        flash('There are no competitions yet.')
+        return redirect(url_for("adjudication_system.event"))
+    if request.method == "POST":
+        form = request.form
+        if 'save_assignments' in form:
+            for comp in competitions:
+                try:
+                    x = form[str(comp.competition_id)]
+                    if comp.has_completed_final() or comp.is_quali_competition():
+                        comp.results_published = True
+                    else:
+                        comp.results_published = False
+                except BadRequestKeyError:
+                    comp.results_published = False
+                # Cache cleared separately instead of cache.clear() in case cache is used again in the future
+                cache.delete(comp.cache())
+            db.session.commit()
+            flash("Changes saved (for those competitions whose results could be published).")
+        return redirect(url_for("adjudication_system.publish_final_results"))
+    return render_template('adjudication_system/publish_final_results.html', competitions=competitions)
 
 
 @bp.route('/adjudicator_dashboard', methods=['GET'])
@@ -1271,10 +1485,10 @@ def adjudicate_start_page():
     dancing_round_id = request.args.get('round_id', 0, type=int)
     dancing_round = Round.query.filter(Round.round_id == dancing_round_id).first()
     if dancing_round is None:
-        return redirect(url_for("main.dashboard"))
+        return redirect(url_for("adjudication_system.adjudicator_dashboard"))
     if not dancing_round.is_active:
-        flash("{} is currently closed.".format(dancing_round.competition))
-        return redirect(url_for("main.dashboard"))
+        flash(f"{dancing_round.competition} is currently closed.")
+        return redirect(url_for("adjudication_system.adjudicator_dashboard"))
     return render_template('adjudication_system/adjudicate_start_page.html', dancing_round=dancing_round)
 
 
@@ -1352,8 +1566,9 @@ def starting_lists():
         return render_template('adjudication_system/starting_lists.html', competitions=competitions)
 
 
-@bp.route('/heat_lists', methods=['GET'])
-def heat_lists():
+@bp.route('/heat_lists', methods=['GET'], defaults={'competition_id': 0})
+@bp.route('/heat_lists/<int:competition_id>', methods=['GET'])
+def heat_lists(competition_id):
     competitions = Competition.query.all()
     competitions = [c for c in competitions if len(c.rounds) > 0 and c.dancing_class.name != TEST]
     competition_id = request.args.get('competition', 0, int)
@@ -1378,15 +1593,27 @@ def starting_numbers():
     return render_template('adjudication_system/competition_starting_numbers.html', dancers=dancers)
 
 
-@bp.route('/results', methods=['GET'])
-def results():
+@bp.route('/results', methods=['GET'], defaults={'competition_id': 0})
+def results(competition_id):
     competitions = Competition.query.order_by(Competition.when).all()
     competitions = [c for c in competitions if c.results_published and c.dancing_class.name != TEST]
-    competition_id = request.args.get('competition', 0, int)
     if competition_id in [c.competition_id for c in competitions]:
-        comp = Competition.query.get(competition_id)
-        return render_template('adjudication_system/competition_results.html', comp=comp)
+        return redirect(url_for('adjudication_system.competition_results', competition_id=competition_id))
     else:
         if competition_id > 0:
             flash('Competition not found.')
         return render_template('adjudication_system/results.html', competitions=competitions)
+
+
+def cache_results():
+    return RESULTS_CACHE.format(request.view_args["competition_id"])
+
+
+@bp.route('/results/<int:competition_id>', methods=['GET'])
+@cache.cached(timeout=86400, key_prefix=cache_results)
+def competition_results(competition_id):
+    comp = Competition.query.get(competition_id)
+    if comp.results_published:
+        return render_template('adjudication_system/competition_results.html', comp=comp)
+    else:
+        return redirect(url_for('adjudication_system.results'))
