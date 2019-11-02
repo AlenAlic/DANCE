@@ -220,7 +220,6 @@ class Competition(db.Model):
     qualification_id = db.Column(db.Integer, db.ForeignKey('competition.competition_id',
                                                            onupdate="CASCADE", ondelete="CASCADE"))
     qualifications = db.relationship("Competition", backref=db.backref('qualification', remote_side=[competition_id]))
-    heat_list = db.Column(db.Text(), nullable=True, default=None)
 
     def __repr__(self):
         return '{disc} {cls}'.format(cls=self.dancing_class, disc=self.discipline)
