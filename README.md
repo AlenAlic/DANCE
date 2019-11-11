@@ -3,200 +3,50 @@
 Web based adjudication system for Ballroom competitions.
 
 ## Installation (Ubuntu or Raspbian)
-This will assume a fresh installation of Ubuntu 18.04. The installation on Raspbian is similar.
-
-Commands that are both systems, unless stated otherwise.
-
-Before we start installing the system, start with the following commands to update te system:
-
-    sudo apt -y update
-    sudo apt -y upgrade
-
-On Ubuntu, you might need to update your drivers as well:
-
-    sudo ubuntu-drivers autoinstall
-
-### Base dependencies
-First, we will need install a few base dependencies:
-
-**Ubuntu**
-
-    sudo apt -y install python3 python3-venv python3-dev mysql-server supervisor nginx git
-
-**Raspbian**
-
-    sudo apt -y install python3 python3-venv python3-dev mariadb-server supervisor nginx git libatlas-base-dev
+### Preparations
+Before installing, make sure you have a domain available.
 
 ### Installing the application
 Install the application through git:
 
-    # clone the repository
     git clone https://github.com/AlenAlic/DANCE
     cd DANCE
 
-#### Dependencies
-Create a virtualenv and activate it. Then install all the package dependencies in the virtualenv:
-
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install pip --upgrade
-    pip install setuptools --upgrade
-    pip install -r requirements.txt
-    pip install gunicorn
-
-#### Config
-Create a file named the config.py file in the instance folder.
-
-    sudo nano instance/config.py
-
-The file should contain the following variables:
-
-    ENV = 'production'
-    DEBUG = False
-    SECRET_KEY = 'random_string'
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://dance:<db_password>@localhost:3306/dance'
-    SQLALCHEMY_ECHO = False
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_RECORD_QUERIES = False
-
-You can create the SECRET_KEY for the website, and password for the MySQL database using the following command:
-
-    python3 -c "import uuid; print(uuid.uuid4().hex)"
-
-Save the config file (Ctrl+x, y, Enter).
-
-Finally, you need to set the FLASK_APP environment variable in the system:
+### Variables
+Before installing anything, set the following environment variables:
 
     export FLASK_APP=run.py
-    echo "export FLASK_APP=run.py" >> ~/.profile
-The second line sets it so that the command is automatically run when you log in.
+    export DOMAIN=<domain_url>
+    export DB_USER=<username>
+    export DB_PASSWORD=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
+    export SECRET_KEY=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
 
-### Database
-Enter the database with the following command:
+### Installation script
 
-    sudo mysql
+#### Base items
+To install all the base dependencies, run the `install_base` script.
 
-Create a new database called **dance**, along with a user with the same name, that has full access to the database.
+    source scripts/install_base
 
-    create database dance character set utf8 collate utf8_bin;
-    create user 'dance'@'localhost' identified by '<db-password>';
-    grant all privileges on dance.* to 'dance'@'localhost';
-    flush privileges;
-    quit;
+Then, run the `install_DANCE` script:
 
-Make sure you replace <db-password> with the password that was set in the *config.py* file.
+    source scripts/install_DANCE
+Finally, copy the `DB_PASSWORD` and run the following command to create a login path for backups:
 
-Next, we need to initialize the database structure:
+    sudo mysql_config_editor set --login-path=$DB_USER --host=localhost --user=$DB_USER --password
+When prompted, paste the password and press Enter.
 
-    flask db upgrade
 
-### Set up admin account for website
+
+#### Set up admin account for website
 Before you can log in to the site, you will need to create the admin account (and floor manager account) through the shell:
 
     flask shell
-    create_tournament_office('admin_password', 'floor_manager_password')
+    create_tournament_office(tournament_office_password, floor_manager_password, presenter_password)
     exit()
+You can log in with the usernames admin, floor, and presenter as the tournament office manager, floor manager, and presenter respectively.
 
-You can log in with the usernames *admin*, and *floor* as the tournament office manager and floor manager respectively.
+Remember to deactivate the venv:
 
-### Gunicorn
-Gunicorn is a pure Python web server that will be used in stead of the built in Flask server. Though in stead of running gunicorn directly, we'll let it run through the supervisor package. Supervisor will then have it running in the background instead. Should something happen to the server, or if the machine is rebooted, the server will be restarted on its own.
-
-Create a file called *dance.conf* in the folder */etc/supervisor/conf.d/*
-
-    sudo nano /etc/supervisor/conf.d/dance.conf
-
-Copy the data from below into that file and replace *<username>* with the username of the machine account.
-
-    [program:dance]
-    command=/home/<username>/DANCE/venv/bin/gunicorn -b 127.0.0.1:8000 -w 2 run:app
-    directory=/home/<username>/DANCE
-    user=<username>
-    autostart=true
-    autorestart=true
-    stopasgroup=true
-    killasgroup=true
-
-After saving this file, reload the supervisor.
-
-    sudo supervisorctl reload
-
-The gunicorn web server should now be up and running on localhost:8000.
-
-### Nginx
-Nginx is used to serve the pages that are generated by Gunicorn to the outside world.
-
-After installation, Nginx already comes with a test site. Remove it first:
-
-    sudo rm /etc/nginx/sites-enabled/default
-
- Create a file called *dance. in the folder */etc/nginx/sites-enabled/*
-
-    sudo nano /etc/nginx/sites-enabled/dance
-
-Copy the data from below into that file and replace *<username>* with the username of the machine account.
-
-    server {
-        # listen on port 80 (http)
-        listen 80;
-        server_name _;
-
-        location / {
-            # forward application requests to the gunicorn server
-            proxy_pass http://127.0.0.1:8000;
-            proxy_redirect off;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        }
-
-        location /static {
-            # handle static files directly, without forwarding to the application
-            alias /home/<username>/DANCE/adjudication_system/static;
-            expires 30d;
-        }
-    }
-
-After saving this file, reload nginx:
-
-    sudo service nginx reload
-
-### Congratulations!
-
-The xTDS Adjudication System should be available on the local network through the local ip address of the machine you're on.
-
-### Allow external access
-If you wish to reach the site through the internet, you'll need a firewall and allow outside access to the server.
-
-We'll install ufw (the Uncomplicated Firewall), and configure to allow external traffic on port 80 (http), and port 443 (https). We'll add port 22 (ssh) so that you do not always need to be physically next to the server.
-
-    sudo apt install -y ufw
-    sudo ufw allow http
-    sudo ufw allow https
-    sudo ufw allow ssh
-    sudo ufw --force enable
-
-### SSL Certificate
-To have our website accessible through HTTPS, we'll use Certbot to install a Let's Encrypt certificate.
-
-To install Certbot, run the following commands.
-
-    sudo apt install -y software-properties-common
-    sudo add-apt-repository universe
-    sudo add-apt-repository ppa:certbot/certbot
-
-You will be prompted to install the certbot package. Press ENTER to proceed.
-
-    sudo apt install -y certbot python-certbot-nginx
-
-To install the certificate, use the following command.
-
-    sudo certbot --nginx -d <your_domain>
-
-You will be prompted to enter an email address. This will address will be used to notify you for urgent renewal issues, or security notices. Enter a valid email address and press ENTER to proceed.
-
-Afterwards, press a, then ENTER to accept the terms for the Let's Encrypt service.
-
-Next, you will be asked if you will allow your email address to be shared with the EFF. This is up to your own discretion.
-
-Lastly, you will be prompted whether or not you wish to redirect all traffic from HTTP to HTTPS. Press 2, and then ENTER to redirect all traffic to HTTPS.
+    deactivate
+    
