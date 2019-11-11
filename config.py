@@ -24,8 +24,8 @@ class Config(object):
     CACHE_DIR = os.path.join(basedir, "cache")
     CACHE_THRESHOLD = 100
 
-    ODK = False
-    SOND = False
+    ODK = os.environ.get('ODK') == "True" or False
+    SOND = os.environ.get('SOND') == "True" or False
 
 # requirements
 # pip freeze > requirements.txt

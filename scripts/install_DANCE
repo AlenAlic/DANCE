@@ -59,7 +59,7 @@ echo "Database migration complete==================="
 echo "Setting up supervisor========================="
 sudo -E bash -c 'cat > /etc/supervisor/conf.d/$DB_USER.conf' << EOL
 [program:$DB_USER]
-command=/home/$USER/DANCE/venv/bin/gunicorn -b 127.0.0.1:8101 -w 3 run:app
+command=/home/$USER/DANCE/venv/bin/gunicorn -b 127.0.0.1:8200 -w 3 run:app
 directory=/home/$USER/DANCE
 user=$USER
 autostart=true
@@ -111,8 +111,6 @@ echo "Created backup folder========================="
 
 echo "Creating update script========================"
 bash -c 'cat > scripts/update' << EOL
-cd DANCE
-
 echo "Creating database backup===="
 mysqldump --login-path=$DB_USER $DB_USER | xz -z > "DANCE/backups/backup-\$(date +%Y%m%d-%H%M).db.xz";
 echo "========================Done"
@@ -136,8 +134,6 @@ echo "Restarting Services========="
 sudo supervisorctl restart $DB_USER
 sudo systemctl reload nginx
 echo "========================Done"
-
-cd ..
 EOL
 echo "Created update script========================="
 

@@ -41,6 +41,7 @@ When prompted, paste the password and press Enter.
 #### Set up admin account for website
 Before you can log in to the site, you will need to create the admin account (and floor manager account) through the shell:
 
+    source venv/bin/activate
     flask shell
     create_tournament_office(tournament_office_password, floor_manager_password, presenter_password)
     exit()
