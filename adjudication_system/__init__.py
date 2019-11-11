@@ -8,6 +8,7 @@ from flask_bootstrap import Bootstrap
 from flask_caching import Cache
 from wtforms import PasswordField
 import adjudication_system.values as values
+from config import Config
 
 
 class MyAdminIndexView(AdminIndexView):
@@ -70,14 +71,14 @@ class Anonymous(AnonymousUserMixin):
         return False
 
 
-def create_app():
+def create_app(config_class=Config):
     from adjudication_system.models import User, Event, Competition, DancingClass, Discipline, Dance, Round, \
         Heat, Couple, Adjudicator, Mark, CouplePresent, RoundResult, FinalPlacing, DanceActive, CompetitionMode, Dancer
 
     # Create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object('config')
-    app.config.from_pyfile('config.py')
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+    app.url_map.strict_slashes = False
 
     # Init add-ons
     db.init_app(app)

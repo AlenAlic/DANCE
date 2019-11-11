@@ -3,4 +3,6 @@
 .vscode
 venv/
 
-instance/config.py
+__pychache__
+
+.env
