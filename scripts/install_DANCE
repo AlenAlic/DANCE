@@ -20,12 +20,6 @@ if [[ $continue = "y" ]]
 then
 
 
-echo "Installing git repository====================="
-git clone https://github.com/AlenAlic/DANCE
-cd DANCE
-echo "Installing git repository complete============"
-
-
 echo "Installing venv==============================="
 python3 -m venv venv
 source venv/bin/activate
