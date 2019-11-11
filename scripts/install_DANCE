@@ -111,10 +111,6 @@ echo "Created backup folder========================="
 
 echo "Creating update script========================"
 bash -c 'cat > scripts/update' << EOL
-echo "Creating database backup===="
-mysqldump --login-path=$DB_USER $DB_USER | xz -z > "DANCE/backups/backup-\$(date +%Y%m%d-%H%M).db.xz";
-echo "========================Done"
-
 echo "Checking out new version===="
 git pull
 echo "========================Done"
