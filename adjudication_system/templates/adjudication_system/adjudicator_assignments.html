@@ -14,7 +14,12 @@ input[type=checkbox]    {transform:scale(2);}
 {% else %}
     {% if g.event.has_competitions() %}
     <form class="form" method="POST" enctype="multipart/form-data" novalidate>
-        <button class="btn btn-primary mb-2" type="submit" name="save_assignments">Save assignments</button>
+        <div>
+            <button class="btn btn-primary mb-2" type="submit" name="save_assignments">Save assignments</button>
+            {% if config.get(g.data.SOND) or config.get(g.data.ODK) %}
+            <button class="btn btn-primary mb-2 float-right" type="submit" name="assign_to_all">Assign all adjudicators to all competitions</button>
+            {% endif %}
+        </div>
         <table class="table table-sm">
             <tbody>
                 {% for date in g.event.unique_dates() %}

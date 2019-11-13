@@ -23,7 +23,7 @@
 
 {% block content %}
 <div class="row mx-0" style="height:100%">
-    <div class="col-2 px-4 pt-3 no-print" style="background:var(--light); overflow-y:auto;">
+    <div class="col-2 px-4 pt-3 no-print" style="background:var(--light); overflow-y:auto; max-height: 100%; position: fixed;">
         <ul class="nav flex-column nav-pills" id="pills-tab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link btn btn-outline-primary" href="{{ url_for('main.index') }}">Dashboard</a>
@@ -54,13 +54,15 @@
         </ul>
         <div class="mb-5"></div>
     </div>
+    <div class="col-2 px-4 pt-3 no-print" style="pointer-events: none;"></div>
 
     <div class="col-8 pt-3 pb-5 center-container" style="overflow-y:auto;">
         {{ flash_messages() }}
         {% block app_content %}{% endblock %}
     </div>
 
-    <div class="col-2 pt-3 px-4 no-print" style="background:var(--light); overflow-y:auto;">
+    <div class="col-2 pt-3 px-4 no-print" style="background:var(--light); overflow-y:auto;"></div>
+    <div class="col-2 pt-3 px-4 no-print" style="background:var(--light); overflow-y:auto; position: fixed; right: 0; max-height: 100%;">
         <img src="{{url_for('static', filename='logo_4_happy_feet.png')}}" class="" style="max-width:70%; height:auto; display:block; margin:auto;">
         {% if event_active %}
             <ul class="nav flex-column nav-pills" id="event-tab" role="tablist">

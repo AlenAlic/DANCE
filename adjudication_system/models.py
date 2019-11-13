@@ -805,8 +805,11 @@ class Round(db.Model):
         return [couples[i * (n // k) + min(i, n % k):(i + 1) * (n // k) + min(i + 1, n % k)] for i in range(k)]
 
     def create_heats(self, heats):
-        for dance in self.dances:
+        if current_app.config.get(SOND):
             couples = self.split_couples_into_heats(heats)
+        for dance in self.dances:
+            if not current_app.config.get(SOND):
+                couples = self.split_couples_into_heats(heats)
             for idx, c in enumerate(couples, start=1):
                 heat = Heat()
                 heat.dance = dance
@@ -823,7 +826,7 @@ class Round(db.Model):
                         mark.adjudicator = adj
                         mark.couple = couple
                         if current_app.config.get('ENV') == DEBUG_ENV:
-                            mark.mark = random.choice([True, True, False])  # TESTING
+                            mark.mark = random.choice([True, False])  # TESTING
                         heat.marks.append(mark)
         db.session.commit()
 

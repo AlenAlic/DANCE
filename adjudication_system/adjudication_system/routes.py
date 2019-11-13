@@ -669,6 +669,12 @@ def adjudicator_assignments():
                         comp.adjudicators = Adjudicator.query.filter(Adjudicator.adjudicator_id.in_(adjudicators)).all()
                 db.session.commit()
                 flash("Saved assignments", "alert-success")
+            if 'assign_to_all' in form and current_app.config.get(SOND):
+                all_competitions = Competition.query.all()
+                for adj in all_adjudicators:
+                    adj.competitions.extend(all_competitions)
+                db.session.commit()
+                flash("Saved assignments", "alert-success")
     else:
         flash("There is no event yet for adjudicators to be assigned to.")
         return redirect(url_for("main.dashboard"))
@@ -798,8 +804,8 @@ def available_couples():
                 for import_string in import_list:
                     d = import_string.split(',')
                     if len(d) == 4:
-                        check_lead = Dancer.query.filter(Dancer.name == d[0], Dancer.role == LEAD).first()
-                        check_follow = Dancer.query.filter(Dancer.name == d[1], Dancer.role == FOLLOW).first()
+                        check_lead = Dancer.query.filter(Dancer.number == d[0], Dancer.role == LEAD).first()
+                        check_follow = Dancer.query.filter(Dancer.number == d[1], Dancer.role == FOLLOW).first()
                         check_competition = Competition.query.join(Discipline, DancingClass)\
                             .filter(Discipline.name == d[2], DancingClass.name == d[3]).first()
                         if check_lead is not None and check_follow is not None:
@@ -1571,7 +1577,6 @@ def starting_lists():
 def heat_lists(competition_id):
     competitions = Competition.query.all()
     competitions = [c for c in competitions if len(c.rounds) > 0 and c.dancing_class.name != TEST]
-    competition_id = request.args.get('competition', 0, int)
     if competition_id in [c.competition_id for c in competitions]:
         comp = Competition.query.get(competition_id)
         return render_template('adjudication_system/competition_heat_lists.html', comp=comp)
@@ -1590,6 +1595,8 @@ def starting_numbers():
         if d.number not in all_numbers:
             all_numbers.append(d.number)
             dancers.append(d)
+    if current_app.config.get(SOND):
+        dancers = [d for d in dancers if d.role == LEAD]
     return render_template('adjudication_system/competition_starting_numbers.html', dancers=dancers)
 
 

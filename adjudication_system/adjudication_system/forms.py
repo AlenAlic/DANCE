@@ -70,7 +70,7 @@ class ImportDancersForm(FlaskForm):
 class ImportCouplesForm(ImportDancersForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.import_string.label.text = "Import from CSV string (name_lead,name_follow,discipline,class). " \
+        self.import_string.label.text = "Import from CSV string (lead_number,follow_number,discipline,class). " \
                                         "You can also omit the discipline and class (the commas must still be there!) "\
                                         "to just create a couple, without adding them to a competition"
 
