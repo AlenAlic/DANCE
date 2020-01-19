@@ -108,7 +108,7 @@ echo "Setting up config============================="
 sudo bash -c 'cat > public/config/config.json' << EOL
 {
     "api": {
-        "url": "https://api.$DOMAIN"
+        "url": "https://api.$DOMAIN/api"
     }
 }
 EOL
