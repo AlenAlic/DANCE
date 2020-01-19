@@ -28,7 +28,7 @@ def index():
     return render_template("index.html", login_form=form)
 
 
-@bp.route("/remote_login", methods=[POST])
+@bp.route("/api/remote_login", methods=[POST])
 def login():
     token = decode_token(request.form["token"])
     if token is not None:

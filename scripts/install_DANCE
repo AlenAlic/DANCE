@@ -30,21 +30,6 @@ pip install gunicorn
 echo "Installing venv complete======================"
 
 
-echo "Setting environment variables================="
-bash -c  'cat > .env' << EOL
-SECRET_KEY = $SECRET_KEY
-
-DATABASE_URI = "mysql+pymysql://$DB_USER:$DB_PASSWORD@localhost:3306/$DB_USER?charset=utf8mb4"
-
-PRETTY_URL = "$DOMAIN"
-ALLOWED_URLS = ["https://$DOMAIN"]
-
-TOURNAMENT = "xTDS"
-
-EOL
-echo "Setting environment variables done============"
-
-
 echo "Create database and user======================"
 sudo mysql<<EOF
 CREATE DATABASE $DB_USER CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -58,9 +43,13 @@ echo "Created database and user====================="
 echo "Setting environment variables================="
 bash -c  'cat > .env' << EOL
 SECRET_KEY = $SECRET_KEY
+
 DATABASE_URI = "mysql+pymysql://$DB_USER:$DB_PASSWORD@localhost:3306/$DB_USER?charset=utf8mb4"
+
 PRETTY_URL = "$DOMAIN"
 ALLOWED_URLS = ["https://$DOMAIN"]
+
+TOURNAMENT = "xTDS"
 EOL
 echo "Setting environment variables done============"
 

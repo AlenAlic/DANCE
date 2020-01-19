@@ -23,7 +23,7 @@ export default {
   data: function() {
     return {
       loading: false,
-      url: this.$config.api.url.replace("/api", "/remote_login"),
+      url: this.$config.api.url + "/remote_login",
       token: null
     };
   },

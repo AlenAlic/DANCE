@@ -99,11 +99,10 @@ class EventAPIDashboard(Resource):
     @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
     def get(self):
         """Get the dashboard data"""
+        users = User.query.filter(User.is_active.is_(True)).order_by(User.username).all()
+        users = [u for u in users if u != current_user]
         return {
-            "users": [
-                u.json() for u in User.query.filter(User.is_active.is_(True),
-                                                    User != current_user).order_by(User.username).all()
-            ]
+            "users": [u.json() for u in users]
         }
 
     @api.doc("switch user")
