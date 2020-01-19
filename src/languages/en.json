@@ -1,0 +1,848 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "profile": "Profile"
+  },
+  "network-errors": {
+    "unknown": "Something went wrong while executing your request, please try again later.",
+    "credentials": "You are not authorized to perform this action.",
+    "forbidden": "You are not allowed to perform this action.",
+    "not-found": "The server was unable to find the information you requested.",
+    "server-offline": "The server is offline, the system is temporarily unavailable.",
+    "server-timeout": "The server took too long to respond, please try again. If this keeps happening, please contact the administrator",
+    "server-cors": "There seems to have been a CORS issue with the server. If this keeps happening, please contact the administrator",
+    "bad-request": "Incomplete request sent, please check it and try again.",
+    "payload-too-large": "The file is too large to be uploaded.",
+    "network": "Cannot connect to the server."
+  },
+  "general": {
+    "cancel": "Cancel",
+    "loading": "Loading",
+    "search": "Search...",
+    "rows_per_page": "Rows per page:",
+    "delete": "Delete",
+    "ok": "OK"
+  },
+  "form_validation": {
+    "errors": {
+      "required": "This field is required",
+      "no_existing_attribute": "{attribute} already exists."
+    }
+  },
+  "navigation": {
+    "page_not_found": "This page does not exist.",
+    "go_back": "Go back",
+    "back_to_home_page": "Back to home page",
+    "back_to_login_page": "Back to login page"
+  },
+  "auth": {
+    "activate": {
+      "title": "Activate your account",
+      "verifying_token": "Verifying token",
+      "verification_error": "Something went wrong, could not verify activation token.",
+      "set_password": "Please set a password to activate your account.",
+      "activate": "Activate account",
+      "unknown_code": "Unknown activation code.",
+      "error": ""
+    },
+    "password": "Password",
+    "repeat_password": "Repeat password",
+    "username": "Username",
+    "email": "E-mail",
+    "remember_me": "Remember me",
+    "log_in": "Sign in",
+    "log_out": "Sign out",
+    "forgot_password": "Forgot password?",
+    "request_new_password": "Request new password",
+    "reset_password": "Reset password",
+    "password_reset_email_sent": {
+      "title": "E-mail sent",
+      "text": "An e-mail with instruction on how to reset your password has been sent to the given email address."
+    },
+    "new_password_set": {
+      "title": "New password set",
+      "text": "Your new password has been set. You can now use it to log in."
+    },
+    "change_password": "Change password",
+    "errors": {
+      "valid_email": "Must be a valid e-mail address",
+      "password_required": "Password is required",
+      "invalid_login": "Invalid username or password.",
+      "inactive_account": "Account is inactive. Please contact the administrator."
+    }
+  },
+  "password_requirements": {
+    "title": "The password must:",
+    "minimum_character_count": "contain at least {num} characters",
+    "lowercase_letter": "contain at least one lowercase letter",
+    "uppercase_letter": "contain at least one uppercase letter",
+    "number": "contain at least one number",
+    "match": "match the repeat password",
+    "not_old_password": "not be the old password"
+  },
+  "header": {
+    "links": {
+      "title": "DANCE",
+      "home": "Home",
+      "starting_lists": "Starting lists",
+      "heat_lists": "Heat lists",
+      "results": "Results",
+      "past_events": "Past events"
+    }
+  },
+  "home": {
+    "title": "DANCE",
+    "text": "The DANCE system (Dancing and Adjudication Network for Crossing and Evaluation) is an adjudication system for Ballroom competitions."
+  },
+  "navigation_drawers": {
+    "dashboard": "Dashboard",
+    "new_event": "New event",
+    "event": {
+      "headers": {
+        "competition_dependencies": "Competitions dependencies",
+        "adjudication": "Adjudication",
+        "competition_nexus": "Competition nexus",
+        "publication": "Publication"
+      },
+      "dances": "Dances",
+      "disciplines": "Disciplines",
+      "classes": "Classes",
+      "adjudicators": "Adjudicators",
+      "assignments": "Assignments",
+      "dancers": "Dancers",
+      "couples": "Couples",
+      "results": "Final results"
+    },
+    "round": {
+      "headers": {
+        "round": "Round",
+        "dance": "Dance",
+        "publication": "Publication"
+      },
+      "progress": "Progress",
+      "reports": "Reports",
+      "add_remove_couple": "Add/Remove couple",
+      "results": "Final results",
+      "floor_management": "Floor management",
+      "adjudication": "Adjudication",
+      "move_couples": "Move couples",
+      "heat_lists": "Heat lists"
+    }
+  },
+  "tournament_office": {
+    "dashboard": {
+      "switch_user": {
+        "title": "Switch to a different user",
+        "user": {
+          "label": "User"
+        },
+        "submit": "Switch"
+      },
+      "database": {
+        "title": "Database",
+        "text": "Access the database directly.",
+        "submit": "Go to database"
+      }
+    }
+  },
+  "event": {
+    "create_new_event": {
+      "title": "Create new event",
+      "name": "Event name",
+      "submit": "Create event"
+    },
+    "database": {
+      "title": "Database reset",
+      "subtitle": "Clear all competitions, dances, etc., and reset the database to the starting state.\n\nIf no results are saved for the current event, the event itself will also be deleted.",
+      "submit": "Reset database",
+      "modal": {
+        "title": "WARNING!",
+        "text": "You are about to delete this event.\nThis is IRREVERSIBLE!\nAre you sure you wish to proceed?"
+      }
+    },
+    "results": {
+      "title": "Save event results",
+      "subtitle": "Save the published results of the current event.",
+      "submit": "Save results",
+      "modal": {
+        "title": "Event results",
+        "saved": "Competitions that will have their results saved:",
+        "not_saved": "Competitions that will be ignored:"
+      }
+    },
+    "setup": {
+      "default": {
+        "title": "Create default competitions",
+        "text1": "Choose which competitions to create from the options below, and create all necessary dances, discipline, and classes. If you're not sure if the default values will work the event, you can create everything manually.",
+        "warning": "Warning!",
+        "text2": "Doing this will delete any previously created dances, disciplines, and classes.",
+        "label": "Competitions to create:",
+        "date": {
+          "label": "Date"
+        },
+        "submit": "Create default competitions"
+      },
+      "competition": {
+        "title": "Create new competition",
+        "text": "Create a new competition for the event. Dances, disciplines and classes can be created through the menu on the right.",
+        "submit": "Create competition"
+      }
+    },
+    "disciplines": {
+      "title": "Disciplines",
+      "add_button": "Create new discipline",
+      "new_discipline": {
+        "title": "Add a new discipline to the system",
+        "submit": "Create discipline"
+      },
+      "edit_discipline": {
+        "title": "Edit discipline",
+        "submit": "Save changes"
+      },
+      "form": {
+        "name": {
+          "label": "Name"
+        },
+        "tag": {
+          "label": "Tag"
+        },
+        "dances": {
+          "label": "Dances",
+          "no_data": "No dances that don't have a discipline available"
+        }
+      },
+      "delete_discipline": {
+        "title": "Delete discipline",
+        "text": "Are you sure you wish to delete {discipline}?",
+        "submit": "Delete"
+      },
+      "table": {
+        "headers": {
+          "name": "Name",
+          "tag": "Tag",
+          "dances": "Dances"
+        }
+      }
+    },
+    "dances": {
+      "title": "Dances",
+      "add_button": "Create new dance",
+      "new_dance": {
+        "title": "Add a new dance to the system",
+        "submit": "Create dance"
+      },
+      "edit_dance": {
+        "title": "Edit dance",
+        "submit": "Save changes"
+      },
+      "form": {
+        "name": {
+          "label": "Name"
+        },
+        "tag": {
+          "label": "Tag"
+        },
+        "discipline": {
+          "label": "Discipline"
+        },
+        "order": {
+          "label": "Order",
+          "hint": "Used to determine in which order dances are shown (ascending)."
+        }
+      },
+      "delete_dance": {
+        "title": "Delete dance",
+        "text": "Are you sure you wish to delete {dance}?",
+        "submit": "Delete"
+      },
+      "table": {
+        "headers": {
+          "name": "Name",
+          "tag": "Tag",
+          "discipline": "Discipline",
+          "order": "Order"
+        }
+      }
+    },
+    "classes": {
+      "title": "Classes",
+      "add_button": "Create new class",
+      "new_class": {
+        "title": "Add a new class to the system",
+        "submit": "Create class"
+      },
+      "edit_class": {
+        "title": "Edit class",
+        "submit": "Save changes"
+      },
+      "form": {
+        "name": {
+          "label": "Name"
+        },
+        "tag": {
+          "label": "Tag"
+        }
+      },
+      "delete_class": {
+        "title": "Delete class",
+        "text": "Are you sure you wish to delete {class}?",
+        "submit": "Delete"
+      },
+      "table": {
+        "headers": {
+          "name": "Name",
+          "tag": "Tag"
+        }
+      }
+    },
+    "adjudicators": {
+      "title": "Adjudicators",
+      "add_button": "Add new adjudicator",
+      "new_adjudicator": {
+        "title": "Add a new adjudicator to the system",
+        "submit": "Add adjudicator"
+      },
+      "edit_adjudicator": {
+        "title": "Edit adjudicator",
+        "submit": "Save changes"
+      },
+      "form": {
+        "name": {
+          "label": "Name"
+        },
+        "tag": {
+          "label": "Tag"
+        },
+        "password":{
+          "label": "Password",
+          "hint": "Leave blank to keep the original password"
+        }
+      },
+      "delete_adjudicator": {
+        "title": "Delete adjudicator",
+        "text": "Are you sure you wish to delete {name}?",
+        "submit": "Delete"
+      },
+      "table": {
+        "headers": {
+          "name": "Name",
+          "tag": "Tag",
+          "competitions": "Competitions"
+        }
+      }
+    },
+    "assignments": {
+      "title": "Adjudicator assignments",
+      "text": "There are unsaved assignments. Please remember to save.",
+      "save": "Save assignments",
+      "check": "Check all",
+      "uncheck": "Uncheck all",
+      "adjudicator": "Adjudicator",
+      "number": "#"
+    },
+    "dancers": {
+      "csv": {
+        "title": "CSV mass import",
+        "subtitle": "Import from a list csv strings (\"number\",\"name\",\"team name\",\"role\"), where role is either \"lead\", \"follow\", or \"both\"",
+        "label": "CSV list",
+        "submit": "Add dancers",
+        "added": "Added {count} unique new dancers."
+      },
+      "title": "Dancers",
+      "add_button": "Add new dancer",
+      "new_dancer": {
+        "title": "Add a new dancer to the system",
+        "submit": "Add dancer"
+      },
+      "edit_dancer": {
+        "title": "Edit dancer",
+        "submit": "Save changes"
+      },
+      "form": {
+        "number": {
+          "label": "Number"
+        },
+        "name": {
+          "label": "Name"
+        },
+        "role": {
+          "label": "Role"
+        },
+        "team": {
+          "label": "Team"
+        },
+        "competitions": {
+          "label": "Competitions",
+          "hint": "Competitions that the person has signed up for solo."
+        },
+        "partners": "PARTNERS"
+      },
+      "delete_dancer": {
+        "title": "Delete dancer",
+        "text": "Are you sure you wish to delete {name}?",
+        "submit": "Delete"
+      },
+      "table": {
+        "headers": {
+          "number": "Number",
+          "name": "Name",
+          "role": "Role",
+          "team": "Team"
+        }
+      }
+    },
+    "couples": {
+      "csv": {
+        "title": "CSV mass import",
+        "subtitle": "Import from a list csv strings (\"lead number\",\"follow number\",\"discipline name\",\"class name\")",
+        "text": "Couples that do not exist will be created. The discipline and class name are used to determine what competition to add the couple to\n\nYou can also omit the discipline and class names to just create a couple, without adding them to a competition.",
+        "label": "CSV list",
+        "submit": "Add couples",
+        "added": "Added {count} unique new couples."
+      },
+      "title": "Couples",
+      "add_button": "Add new couple",
+      "new_couple": {
+        "title": "Add a new couple to the system",
+        "submit": "Add couple"
+      },
+      "edit_couple": {
+        "title": "Edit couple",
+        "submit": "Save changes"
+      },
+      "form": {
+        "lead": {
+          "label": "Lead"
+        },
+        "follow": {
+          "label": "Follow"
+        },
+        "competitions": {
+          "label": "Competitions",
+          "hint": "Competitions the couple is currently signed up for."
+        }
+      },
+      "delete_couple": {
+        "title": "Delete couple",
+        "text": "Are you sure you wish to delete couple {number}, {lead} and {follow}?",
+        "submit": "Delete"
+      },
+      "table": {
+        "headers": {
+          "number": "Number",
+          "lead": "Lead",
+          "follow": "Follow",
+          "team": "Team(s)"
+        }
+      }
+    },
+    "final_results": {
+      "title": "Publish results",
+      "subtitle": "Choose competitions to publish the results of",
+      "save": "Save changes"
+    }
+  },
+  "round": {
+    "new_round": {
+      "title": "Create new round",
+      "submit": "Create new round",
+      "round_types": {
+        "label": "Round type",
+        "hints": {
+          "re_dance": "{num} couple(s) are placed through to the next round without having to participate in the re-dance",
+          "final": "{num} couple(s)"
+        }
+      },
+      "heats": {
+        "label": "Heats",
+        "hint": "{heats} heat(s) of up to {couples} couples per floor ({total} couple(s) total)",
+        "hint_no_floor": "{heats} heat(s) of up to {couples} couple(s) ({total} couple(s) total)"
+      },
+      "floors": {
+        "label": "Floors"
+      },
+      "min_marks": {
+        "label": "Min marks",
+        "hint_multiple_floors": "Per floor"
+      },
+      "max_marks": {
+        "label": "Max marks",
+        "hint_multiple_floors": "Per floor"
+      },
+      "different_heats": {
+        "label": "Different heats per dance"
+      },
+      "dances": {
+        "label": "Dances"
+      },
+      "cutoff": {
+        "all_couples": "All couples",
+        "label": "Cutoff",
+        "hint": "Number of marks that is the cutoff for dancing the next round"
+      },
+      "adjudicators_floors":{
+        "title": "Floor assignments",
+        "text": "If a competition can have multiple floors, adjudicators must be assigned to a floor before you can create the first round.",
+        "submit": "Save floor assignments"
+      },
+      "adjudicators_roles":{
+        "title": "Role assignments",
+        "text": "For a competition where couples change per dance, adjudicators have a specific assignment.\n\nAn adjudicator can be assigned to mark individual dancers or the couple.\n\nIf an adjudicator is assigned to mark both, his/her marks count for both dancers, otherwise it just counts for the assigned role.",
+        "submit": "Save role assignments",
+        "both": "Both"
+      }
+    },
+    "progress": {
+      "next_round": {
+        "title": "Create next round",
+        "subtitle": "The highlighted couples are the ones going on the the next round.\nIf a couple will not participate in the next round (whether the have to dance it or not), you can uncheck them from the starting column.",
+        "submit": "Create next round"
+      },
+      "next_round_after_general_look": {
+        "title": "Next round after general look",
+        "same_heats": {
+          "label": "Keep heats the same"
+        }
+      },
+      "add_remove_couple": {
+        "title": "Add/Remove couple",
+        "subtitle": "Before the first round has started, you can add couples to or remove couples from the round.",
+        "add": "Add couple",
+        "remove": "Remove couple"
+      },
+      "add_couple": {
+        "title": "Add couple",
+        "label": "Couple",
+        "no_data": "No couples (yet)",
+        "submit": "Add couple"
+      },
+      "remove_couple": {
+        "title": "Remove couple",
+        "label": "Couple",
+        "no_data": "No couples (yet)",
+        "submit": "Remove couple"
+      },
+      "delete_round": {
+        "title": "Delete this round",
+        "submit": "Delete round",
+        "modal": {
+          "title": "WARNING!",
+          "text": "You are about to delete this round (heats, marks, etc.).\n\nThis is IRREVERSIBLE!\n\nAre you sure you wish to proceed?"
+        }
+      },
+      "split": {
+        "title": "Qualification split",
+        "text": {
+          "not_split": "Split the couples between the competitions of this qualification round.",
+          "split": "The qualification is already split. If you wish re-do it, remove all the dancers from the qualification rounds first."
+        },
+        "button": "Split qualification",
+        "modal":{
+          "title": "Split qualification",
+          "text": "Choose a split for the rounds listed below. The competitions from top to bottom correspond to the numbers from left to right.",
+          "split": {
+            "label": "Split options",
+            "hint": "The splits are sorted from most homogeneous to least."
+          },
+          "button": "Split"
+        }
+      },
+      "header": {
+        "number": "#",
+        "lead": "Lead",
+        "follow": "Follow",
+        "teams": "Team(s)",
+        "total": "Total",
+        "result": "Result",
+        "placing": "Placing",
+        "marks": "Marks"
+      }
+    },
+    "reports": {
+      "print": "Print",
+      "publish": {
+        "title": "Heat list publication",
+        "is_published": "The heat list for this round is published and visible online.",
+        "publish": "Publish heat list",
+        "hide": "Hide heat list"
+      },
+      "labels":{
+        "heats_by_starting_number": "Heats by starting no.",
+        "heats_by_dance": "Heats by dance",
+        "qualified_starts": "Qualified starts",
+        "no_re_dance": "No re-dance",
+        "adjudicators": "Adjudicators",
+        "adjudication_sheets": "Adjudication sheets",
+        "placings_after_round": "Placings after round",
+        "final_evaluation": "Evaluation of final",
+        "tournament_result": "Competition results",
+        "ranking_report": "Ranking report"
+      },
+      "copies": {
+        "label": "No. copies"
+      },
+      "show_preview": "Show preview",
+      "preview": "Printing preview",
+      "subtitles": {
+        "couples_starting": "{num} couples",
+        "dancers_starting": "{leads} leads / {follows} follows",
+        "target_marks": "Target marks: {marks}",
+        "no_re_dance": "{num} couples to next round without re-dance"
+      },
+      "header": {
+        "floor": "Floor",
+        "heat": "Heat",
+        "dance_couple": "Dance/Couple",
+        "number": "#",
+        "placing": "Placing",
+        "marks": "Marks",
+        "lead": "Lead",
+        "follow": "Follow",
+        "teams": "Team(s)",
+        "name": "Name",
+        "tag": "Tag"
+      },
+      "final_evaluation": {
+        "summary": "Final Summary",
+        "number": "No.",
+        "dances": "Dances",
+        "total": "Total",
+        "result": "Result",
+        "rule10": "Rule 10",
+        "rule11": "Rule 11",
+        "adjudicators": "Adjudicators",
+        "places": "Places"
+      },
+      "ranking_report": {
+        "rank": "Rank",
+        "couple": "Couple",
+        "dancer": "Dancer",
+        "team": "Team",
+        "teams": "Team(s)",
+        "number": "No.",
+        "round": "R",
+        "sum": "Su",
+        "total": "Total",
+        "leads": "Leads",
+        "follows": "Follows"
+      }
+    },
+    "floor_management": {
+      "auto_reload": "Auto reload",
+      "reload": "Reload",
+      "save_checked": "Save checked",
+      "uncheck_all": {
+        "button": "Uncheck all",
+        "modal": {
+          "title": "Warning!",
+          "text": "Marking everything as not present for the {dance} is permanent.\n\nAre you sure you wish to proceed?"
+        }
+      },
+      "move_couple": {
+        "button": "Move couple",
+        "modal": {
+          "title": "Move couple",
+          "subtitle": "Choose a couple to move to a different heat.",
+          "move": "Move",
+          "from": {
+            "label": "Heat",
+            "hint": "Heat from which to move the couple"
+          },
+          "couple": {
+            "label": "Couple",
+            "hint": "Couple to move"
+          },
+          "to": {
+            "label": "Heat",
+            "hint": "Heat to move the couple to"
+          }
+        }
+      },
+      "heat": "Heat",
+      "floor": "Floor",
+      "not_needed": "Floor management is not used for the final."
+    },
+    "adjudication": {
+      "enable": "Enable",
+      "disable": "Disable",
+      "close_and_evaluate": {
+        "button": "Close & evaluate round",
+        "modal": {
+          "title": "Evaluate round",
+          "text": "Are you sure you want to evaluate this round?",
+          "evaluate": "Yes, evaluate round"
+        }
+      },
+      "open_round": "Open round & enable all dances",
+      "close_round": "Close round & disable all dances",
+      "auto_reload": "Auto reload",
+      "reload": "Reload",
+      "save_crosses": "Save crosses",
+      "save_placings": "Save placings",
+      "heat": "Heat",
+      "floor": "Floor",
+      "missing_adjudicators": "Missing adjudicators",
+      "not_tracking_adjudicators": "Adjudicators are not actively tracked if the dance is not enabled.",
+      "all_adjudicators_present": "All adjudicators are present.",
+      "target_marks": "Target marks",
+      "final_summary": "Summary",
+      "general_look_round_explanation": "Since this round is a general look, no marks will be given.\n\nPlease check the progress tab to configure the next round",
+      "adjudicator": "Adjudicator",
+      "marks": "Marks",
+      "placings": "Placings",
+      "assignment": {
+        "lead": "Focusing on leads",
+        "follow": "Focusing on follows",
+        "both": "Focusing on the couple"
+      },
+      "update_target": {
+        "modal": {
+          "title": "Update target marks",
+          "min_marks": {
+            "label": "Min marks",
+            "hint_multiple_floors": "Per floor"
+          },
+          "max_marks": {
+            "label": "Max marks",
+            "hint_multiple_floors": "Per floor"
+          },
+          "save": "Save"
+        }
+      }
+    }
+  },
+  "competition": {
+    "title": "Edit competition",
+    "submit": "Save changes",
+    "discipline": {
+      "label": "Discipline",
+      "no_data": "There are no disciplines"
+    },
+    "dancing_class": {
+      "label": "Class",
+      "no_data": "There are no classes"
+    },
+    "floors": {
+      "label": "Floors",
+      "hint": "The maximum number of floors that the competition can use."
+    },
+    "date": {
+      "label": "Date",
+      "hint": "This is used to indicate to adjudicators on what day they have to adjudicate."
+    },
+    "mode": {
+      "label": "Mode",
+      "hint": "Determines how partners are chosen for this competition."
+    },
+    "qualification": {
+      "label": "Qualification",
+      "hint": "The qualification round for this competition. Leave blank if this competition has no qualification."
+    },
+    "adjudicators": {
+      "label": "Adjudicators"
+    },
+    "couples": {
+      "label": "Couples"
+    },
+    "leads": {
+      "label": "Leads"
+    },
+    "follows": {
+      "label": "Follows"
+    },
+    "delete": {
+      "modal": {
+        "title": "Warning!",
+        "text": "Are you sure that you wish to delete the {competition} competition?"
+      }
+    }
+  },
+  "adjudicator": {
+    "start": {
+      "subtitle": "Please select a competition from below to adjudicate.\nOnce you are done, please return to this page.\n\nIf there are no competitions enabled, please reload.",
+      "reload": "Reload",
+      "competitions": "Competitions you are assigned to:"
+    },
+    "errors": {
+      "round_closed": "This round is closed."
+    },
+    "header": {
+      "exit": "Exit",
+      "target": "Target: {target}",
+      "noted": "Noted: {noted}",
+      "closed": "- CLOSED -"
+    },
+    "heat": "Heat"
+  },
+  "floor_manager": {
+    "title": "Floor manager",
+    "text": "Choose a competition from the menu.",
+    "not_available": "The floor manager data for {competition} is not available yet.",
+    "reload": "Reload"
+  },
+  "public": {
+    "heat_lists": {
+      "no_heat_lists": "{competition} has no heat lists published.",
+      "back": "Back to heat lists."
+    },
+    "starting_lists": {
+      "no_starting_lists": "{competition} has no starting lists published.",
+      "back": "Back to starting lists."
+    },
+    "results": {
+      "competition_report": {
+        "header": "Competition report",
+        "adjudicators": {
+          "title": "Adjudicators",
+          "name": "Name",
+          "tag": "Tag"
+        }
+      },
+      "adjudicators": {
+        "header": "Adjudicators"
+      },
+      "start_list": {
+        "header": "Start list"
+      },
+      "competition_listing": {
+        "header": "Competition Listing",
+        "rank": "Rank",
+        "number": "No.",
+        "couple": "Couple",
+        "dancer": "Dancer",
+        "team": "Team",
+        "teams": "Team(s)"
+      },
+      "ranking_report": {
+        "header": "Ranking report",
+        "leads": "Leads",
+        "follows": "Follows"
+      },
+      "final_round": {
+        "header": "Report of Final Round"
+      },
+      "skating_report": {
+        "header": "Skating report"
+      }
+    }
+  },
+  "presenter": {
+    "title": "Presenter dashboard",
+    "round": {
+      "no_rounds": "{competition} has no rounds available.",
+      "label": "Round",
+      "reload": "Reload"
+    },
+    "panel": {
+      "adjudicators": "Adjudicators",
+      "starting_list": "Starting list",
+      "no_re_dance": "No re-dance",
+      "couples_present": "Couples present",
+      "results": "Results"
+    },
+    "leads": "Leads",
+    "follows": "Follows",
+    "place": "Place",
+    "number": "Number"
+  }
+}

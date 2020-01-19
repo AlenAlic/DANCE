@@ -1,8 +1,32 @@
 .cache
+.DS_Store
+node_modules
+/dist
+/venv
+__pycache__
+
+# local env files
+.env.local
+.env.*.local
+.env
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
 .idea
 .vscode
-venv/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-__pychache__
+# Backups
+/backups
 
-.env
+# Local overrides of the client side config.
+/public/config/development.json
+/public/config/config.json

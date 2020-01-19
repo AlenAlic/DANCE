@@ -1,0 +1,21 @@
+//Remove chrome's ugly yellow background for suggestions:
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active
+{
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+[v-cloak]
+{
+    display: none;
+}
+
+html {
+  overflow-y: auto !important;
+}
+
+.text--wrap {
+  white-space: pre-line !important;
+}

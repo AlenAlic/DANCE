@@ -1,0 +1,68 @@
+@import "../../../../assets/css/general/flex";
+@import "../../../../assets/css/general/settings";
+@import "../../../../assets/css/general/states";
+$cell_border: 2px solid black;
+$disabled: #aaaaaa77;
+.cell_container {
+  @extend .flex;
+  @extend .flex-column;
+  margin: 0.2rem;
+  border: $cell_border;
+  @extend .is-not-highlightable;
+
+  .cell {
+    width: 2.5rem;
+    height: 2.5rem;
+    @extend .flex;
+  }
+
+  .number,
+  .mark {
+    @extend .justify-content-center;
+    @extend .align-items-center;
+    &.disabled {
+      background-color: $disabled;
+      cursor: not-allowed;
+    }
+  }
+
+  .number {
+    text-align: center;
+    border-bottom: $cell_border;
+  }
+
+  .mark {
+    cursor: pointer;
+
+    &.marked {
+      background-image: url("../../../../assets/cross.svg");
+      background-position: center center;
+    }
+
+    &.disabled {
+      background-color: $disabled;
+    }
+
+    &.loading {
+      background-color: rgba($info, .2);
+    }
+
+    &.noted {
+      font-size: 3rem;
+      color: black;
+    }
+  }
+
+  input[type=number] {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    -moz-appearance:textfield;
+    font-size: 125%;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block navbar %}{% endblock %}
+
+{% block app_content %}
+<div class="container d-flex flex-column flex-grow-1 justify-content-center">
+    <form class="align-self-center" method="POST" enctype="multipart/form-data">
+        <h3 class="mb-4 text-center">Admin login</h3>
+        {{ login_form.hidden_tag() }}
+        {{ login_form.username(class_='form-control mx-1 my-2', placeholder='Username') }}
+        {{ login_form.password(class_='form-control mx-1 my-2', placeholder='Password') }}
+        {{ login_form.submit(class_='btn btn-primary form-control mx-1 my-3') }}
+    </form>
+</div>
+{% endblock %}

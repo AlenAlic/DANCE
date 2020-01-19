@@ -1,0 +1,15 @@
+@import "mixins";
+
+//Fade
+.fade-enter-active,
+.fade-leave-active
+{
+    @include opacity(1);
+    @include transition(opacity 0.3s, ease-in-out);
+}
+
+.fade-enter,
+.fade-leave
+{
+    @include opacity(0);
+}

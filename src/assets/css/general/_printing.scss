@@ -1,0 +1,87 @@
+@page {
+  size: 210mm 297mm;
+  margin: 15mm 10mm 10mm 10mm;
+}
+
+@media print {
+  html {
+    overflow: hidden;
+  }
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+  header,
+  nav,
+  footer {
+    @extend .no-print;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .card--print {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+  }
+  .print-friendly {
+    page-break-inside: avoid;
+    page-break-after: auto
+  }
+  .no-page-break {
+    display: inline-block;
+    width: 100%;
+    page-break-inside: avoid;
+  }
+  .half-page {
+    max-width: 50%;
+  }
+}
+
+.report {
+  page-break-after: always;
+  page-break-before: always;
+  table {
+    page-break-after: always;
+    page-break-before: auto;
+    width: 100%;
+    border: none;
+    border-collapse: collapse;
+    font-size: .875rem;
+    line-height: 1.375rem;
+    letter-spacing: .0071428571em;
+    tr {
+      page-break-inside: avoid;
+    }
+    tbody {
+      page-break-inside: avoid;
+      td,
+      th {
+        padding: 0.125rem 1.5rem 0.125rem 0;
+        &:first-child {
+          padding-left: 1rem;
+        }
+      }
+    }
+  }
+
+  .separator {
+    clear: both;
+    width: 100%;
+    border-bottom: 1pt solid black;
+  }
+  .grey-separator {
+    clear: both;
+    width: 100%;
+    border-bottom: 1pt solid #efefef;
+  }
+
+  .title-box {
+    padding: 0;
+    border: 2px solid black;
+    text-align: left;
+
+    * {
+      color: black;
+    }
+  }
+}

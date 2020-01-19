@@ -1,0 +1,87 @@
+@import "../../general/settings";
+
+$ranking-border-light: 1px solid #aaaaaa;
+$ranking-border-dark: 1px solid #212121;
+
+.table-ranking {
+  position: relative;
+  font-size: 80% !important;
+  border-collapse: collapse;
+
+  tbody {
+    border: $ranking-border-light;
+    td {
+      border-left: $ranking-border-light;
+      border-right: $ranking-border-light;
+    }
+  }
+
+  thead {
+    border: $ranking-border-light;
+    td {
+      border: $ranking-border-light;
+    }
+  }
+}
+
+.table-ranking {
+  min-width: 100%;
+
+  .table-ranking--bottom {
+    vertical-align: bottom;
+  }
+
+  .table-ranking--padding {
+    height: 3px;
+  }
+
+  .header {
+    color: white;
+    background-color: $primary;
+    font-size: 100% !important;
+  }
+
+  .total-col {
+    background-color: rgba(grey, 0.4);
+  }
+
+  .highlighted-col {
+    background-color: rgba(grey, 0.15);
+  }
+
+  .hidden {
+    display: none;
+  }
+  .rank {
+    min-width: 2.5rem;
+  }
+  .couple {
+    min-width: 10rem;
+    padding-left: 0.5rem !important;
+  }
+  .number {
+    min-width: 2rem;
+  }
+  .round {
+    min-width: 1.5rem;
+  }
+  .adjudicator {
+    min-width: 2.5rem;
+  }
+  .sum {
+    min-width: 2rem;
+  }
+  .total {
+    min-width: 2.5rem;
+  }
+}
+
+.table-ranking td {
+  text-align: center;
+  padding: 0 !important;
+}
+
+.table-ranking-wrapper {
+  overflow-x: auto;
+  padding: 0.25rem;
+}

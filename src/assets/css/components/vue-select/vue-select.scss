@@ -1,0 +1,14 @@
+@import '../../general/settings';
+
+// https://sagalbot.github.io/vue-select/
+// https://vue-select.org
+
+// Default styling
+@import "~vue-select/src/scss/vue-select.scss";
+
+// Possible style overrides using SCSS variables: https://vue-select.org/guide/css.html#scss-variables
+
+// Custom styling
+.vs__clear {
+    display: none;
+}

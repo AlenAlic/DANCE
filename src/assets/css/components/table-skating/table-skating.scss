@@ -1,0 +1,62 @@
+.table-skating,
+.table-skating td,
+.table-skating th {
+  border: 1px solid black;
+
+  &.light {
+    border: 1px solid #aaaaaa;
+  }
+}
+
+.table-skating--light,
+.table-skating--light td,
+.table-skating--light th {
+  border: 1px solid #aaaaaa;
+}
+
+.table-skating {
+  position: relative;
+  font-size: 75% !important;
+  border-collapse: collapse;
+}
+
+.table-skating {
+  min-width: 100%;
+
+  .table-skating--bottom {
+    vertical-align: bottom;
+  }
+  .dance-col {
+    background-color: rgba(grey, 0.4);
+  }
+
+  .highlighted-col {
+    background-color: rgba(grey, 0.15);
+  }
+
+  .number {
+    min-width: 2rem;
+  }
+  .result {
+    min-width: 3rem;
+  }
+  .placing {
+    min-width: 2rem;
+  }
+  .dance {
+    min-width: 2.5rem;
+  }
+  .adjudicator {
+    min-width: 3rem;
+  }
+}
+
+.table-skating td {
+  text-align: center;
+  padding: 0 !important;
+}
+
+.table-skating-wrapper {
+  overflow-x: auto;
+  padding: 0.25rem;
+}

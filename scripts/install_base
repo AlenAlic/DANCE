@@ -20,7 +20,7 @@ echo "System updated================================"
 
 
 echo "Installing install_base dependencies=================="
-sudo apt -y install supervisor python3 python3-venv python3-dev mysql-server supervisor nginx git
+sudo apt -y install supervisor python3 python3-venv python3-dev mysql-server supervisor nginx git npm
 echo "Base dependencies installed==================="
 
 

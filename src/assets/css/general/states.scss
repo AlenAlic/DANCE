@@ -1,0 +1,20 @@
+.is-uppercase {
+  text-transform: uppercase;
+}
+
+.is-clickable {
+  cursor: pointer;
+}
+
+.is-disabled {
+  cursor: not-allowed;
+}
+
+.is-not-highlightable {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                        supported by Chrome, Opera and Firefox */
+}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+<h2>Dashboard</h2>
+<div class="row">
+    {% with url=url_for('admin.index'), title="Database", image='db.png' %}
+        {% include '_dashboard_page.html' %}
+    {% endwith %}
+    {% with url=url_for('api.doc'), title="API Docs", image='api.png', external=true %}
+        {% include '_dashboard_page.html' %}
+    {% endwith %}
+</div>
+{% endblock %}

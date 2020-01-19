@@ -1,0 +1,35 @@
+//Opacity
+@mixin opacity ($opacity)
+{
+    -webkit-opacity: 	$opacity;
+    -moz-opacity: 		$opacity;
+    opacity:            $opacity;
+}
+
+//Transition
+@mixin transition($transition: all 0.2s, $effect: ease-in-out)
+{
+    -moz-transition: $transition $effect;
+    -webkit-transition: $transition $effect;
+    -o-transition: $transition $effect;
+    transition: $transition $effect;
+}
+
+//ScaleY
+@mixin scaleY($scale: 0.5)
+{
+    -webkit-transform: scaleY($scale);
+	-o-transform: scaleY($scale);
+	-ms-transform: scaleY($scale);
+	transform: scaleY($scale);
+}
+
+//Transform origin
+@mixin transform-origin ($loc)
+{
+    -webkit-transform-origin: $loc;
+    -moz-transform-origin: $loc;
+    -ms-transform-origin: $loc;
+    -o-transform-origin: $loc;
+    transform-origin: $loc;
+}

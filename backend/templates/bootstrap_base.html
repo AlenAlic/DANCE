@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+{%- block html %}
+    <head>
+    {%- block head %}
+        <title>Admin</title>
+        {%- block metas %}
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8">
+        {%- endblock metas %}
+        {%- block styles %}
+            <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap-4.4.1.min.css')}}">
+        {%- endblock styles %}
+    {%- endblock head %}
+    </head>
+    <body>
+        {% block body -%}
+
+        {% block navbar %}
+        {%- endblock navbar %}
+
+        {% block content -%}
+        {%- endblock content %}
+
+        {% block scripts %}
+        <script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.4.1.slim.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/popper-1.16.0.min.js')}}"></script>
+        <script type="text/javascript" src="{{url_for('static', filename='js/bootstrap-4.4.1.min.js')}}"></script>
+        {%- endblock scripts %}
+    {%- endblock body %}
+    </body>
+{%- endblock html %}
+</html>
