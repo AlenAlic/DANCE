@@ -128,7 +128,7 @@ server {
     server_name $DOMAIN;
 
     location / {
-        root $home/DANCE/dist;
+        root $HOME/DANCE/dist;
         index index.html;
         try_files \$uri \$uri/ /index.html;
     }
