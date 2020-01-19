@@ -37,6 +37,19 @@ Finally, copy the `DB_PASSWORD` and run the following command to create a login 
 When prompted, paste the password and press Enter.
 
 
+### Backups
+The cronjobs scripts have been generated in the `DANCE/cron/` folder.
+
+To set the automatic backups, open the cronab:
+
+    crontab -e
+
+Append the following to the file:
+
+    MAILTO=""
+
+    0 * * * * ~/DANCE/cron/backup
+
 
 #### Set up admin account for website
 Before you can log in to the site, you will need to create the admin account (and floor manager account) through the shell:
@@ -50,4 +63,3 @@ You can log in with the usernames admin, floor, and presenter as the tournament 
 Remember to deactivate the venv:
 
     deactivate
-    

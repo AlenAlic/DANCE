@@ -36,6 +36,11 @@ SECRET_KEY = $SECRET_KEY
 
 DATABASE_URI = "mysql+pymysql://$DB_USER:$DB_PASSWORD@localhost:3306/$DB_USER?charset=utf8mb4"
 
+PRETTY_URL = "$DOMAIN"
+ALLOWED_URLS = ["https://$DOMAIN"]
+
+TOURNAMENT = "xTDS"
+
 EOL
 echo "Setting environment variables done============"
 
