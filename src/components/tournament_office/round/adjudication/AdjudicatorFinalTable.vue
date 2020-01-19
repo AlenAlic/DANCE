@@ -40,7 +40,6 @@ export default {
     },
     checkPlacings(placings) {
       const placements = this.getSet(placings).length;
-      console.log(placings, this.getSet(placings));
       const couples = placings.length;
       return `${placements}/${couples}`;
     },
