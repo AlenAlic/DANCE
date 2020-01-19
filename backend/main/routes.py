@@ -1,10 +1,11 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, current_app, send_from_directory
 from flask_login import current_user, login_user, logout_user, login_required
 from backend.main import bp
 from backend.main.forms import LoginForm
 from backend.models import User
 from backend.models.user.util import decode_token
 from backend.constants import GET, POST
+import os
 
 
 @bp.route("/", methods=[GET, POST])
@@ -26,6 +27,11 @@ def index():
                 flash("Account inactive", "alert-warning")
                 return redirect(url_for("main.index"))
     return render_template("index.html", login_form=form)
+
+
+@bp.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(current_app.root_path, 'static'), 'favicon.ico')
 
 
 @bp.route("/api/remote_login", methods=[POST])
