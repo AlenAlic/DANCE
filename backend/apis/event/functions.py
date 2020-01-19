@@ -83,7 +83,7 @@ def create_disciplines():
         for d in BASE_DANCES + BONUS_DANCES:
             discipline = Discipline()
             discipline.name = d["name"]
-            discipline.tag = TAGS[d]
+            discipline.tag = TAGS[d["name"]]
             db.session.add(discipline)
             db.session.commit()
             bonus = Discipline.query.filter(Discipline.name == d["name"]).first()
@@ -180,13 +180,18 @@ def generate_odk_competitions(time, competitions):
 def create_odk_competition(disc, d_class, start_time):
     start_time = start_time + timedelta(hours=1)
     if disc in LATIN_DANCES:
-        start_time = start_time + timedelta(hours=4)
+        start_time = start_time + timedelta(hours=5)
     time = start_time
     c = Competition()
     c.discipline = Discipline.query.filter(Discipline.name == disc).first()
     c.dancing_class = DancingClass.query.filter(DancingClass.name == d_class).first()
     c.mode = CompetitionMode.single_partner
-    if disc == SLOW_WALTZ or disc == SAMBA or disc == SALSA or disc == POLKA:
+    if d_class == TEST:
+        c.test = True
+        time = time + timedelta(hours=-1)
+        if disc == SAMBA:
+            time = time + timedelta(hours=-4, minutes=-30)
+    if disc == SLOW_WALTZ or disc == SAMBA or disc == SALSA:
         time = time + timedelta(minutes=0)
     if disc == TANGO or disc == CHA_CHA_CHA or disc == BACHATA:
         time = time + timedelta(minutes=10)
@@ -197,22 +202,17 @@ def create_odk_competition(disc, d_class, start_time):
     if disc == QUICKSTEP or disc == JIVE:
         time = time + timedelta(minutes=40)
     if disc == POLKA:
-        time = time + timedelta(hours=1)
+        time = time + timedelta(minutes=50)
     if disc == SALSA or disc == BACHATA or disc == MERENGUE:
         time = time + timedelta(hours=5)
-    if d_class == TEST:
-        c.test = True
-        time = time + timedelta(hours=-1)
-        if disc == SAMBA:
-            time = time + timedelta(minutes=-30)
     if d_class == BREITENSPORT_QUALIFICATION:
         time = time + timedelta(minutes=0)
     if d_class == AMATEURS:
-        time = time + timedelta(minutes=10)
+        time = time + timedelta(hours=1, minutes=0)
     if d_class == CHAMPIONS:
-        time = time + timedelta(minutes=20)
+        time = time + timedelta(hours=1, minutes=5)
     if d_class == OPEN_CLASS:
-        time = time + timedelta(hours=2)
+        time = time + timedelta(hours=2, minutes=30)
     c.floors = 1
     c.when = time
     c.event = g.event

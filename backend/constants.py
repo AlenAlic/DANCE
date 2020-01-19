@@ -108,11 +108,12 @@ SECOND_BASE_DANCES = [
     for idx, dance in enumerate(BALLROOM_DANCES, len(BASE_DANCES) + 1)
 ]
 DANCES = BASE_DANCES + SECOND_BASE_DANCES
+ADDITIONAL_DANCES = [SALSA, BACHATA, MERENGUE, POLKA]
 BONUS_DANCES = [{
     "name": dance,
     "tag": DANCE_TAGS[dance],
     "order": idx
-} for idx, dance in enumerate(BALLROOM_DANCES, len(DANCES) + 1)]
+} for idx, dance in enumerate(ADDITIONAL_DANCES, len(DANCES) + 1)]
 
 STANDARD_DANCES = STANDARD_DANCES + [dance2(dance) for dance in STANDARD_DANCES]
 LATIN_DANCES = LATIN_DANCES + [dance2(dance) for dance in LATIN_DANCES]
