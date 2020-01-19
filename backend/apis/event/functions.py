@@ -180,7 +180,9 @@ def generate_odk_competitions(time, competitions):
 def create_odk_competition(disc, d_class, start_time):
     start_time = start_time + timedelta(hours=1)
     if disc in LATIN_DANCES:
-        start_time = start_time + timedelta(hours=4)
+        start_time = start_time + timedelta(hours=5, minutes=30)
+        if d_class == AMATEURS or d_class == CHAMPIONS or d_class == OPEN_CLASS:
+            start_time = start_time + timedelta(minutes=30)
     time = start_time
     c = Competition()
     c.discipline = Discipline.query.filter(Discipline.name == disc).first()
@@ -204,7 +206,7 @@ def create_odk_competition(disc, d_class, start_time):
     if disc == POLKA:
         time = time + timedelta(minutes=50)
     if disc == SALSA or disc == BACHATA or disc == MERENGUE:
-        time = time + timedelta(hours=6)
+        time = time + timedelta(hours=6, minutes=30)
     if d_class == BREITENSPORT_QUALIFICATION:
         time = time + timedelta(minutes=0)
     if d_class == AMATEURS:
