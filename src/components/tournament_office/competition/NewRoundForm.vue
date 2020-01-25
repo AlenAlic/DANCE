@@ -173,9 +173,17 @@ export default {
     },
     getDances() {
       if (!this.competition.last_round) {
-        return this.$store.state.config.config.base_dances[this.competition.discipline.name].map(
-          d => d.dance_id
-        );
+        if (
+          Object.keys(this.$store.state.config.config.base_dances).includes(
+            this.competition.discipline.name
+          )
+        ) {
+          return this.$store.state.config.config.base_dances[this.competition.discipline.name].map(
+            d => d.dance_id
+          );
+        } else {
+          return [];
+        }
       } else {
         return this.competition.dances.map(d => d.dance_id);
       }
