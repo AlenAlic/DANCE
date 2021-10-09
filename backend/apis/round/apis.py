@@ -11,7 +11,7 @@ from backend.models.couple import Couple
 from backend.models.heat import Heat
 from backend.models.round_result import RoundResult
 from backend.models.couple.functions import generate_new_couples_from_dancers
-from backend.constants import AL_TOURNAMENT_OFFICE_MANAGER
+from backend.constants import AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER
 from backend.models.user.wrappers import login_required, requires_access_level
 
 
@@ -567,7 +567,7 @@ class RoundAPIPresenter(Resource):
 
     @api.doc("round_presenter")
     @login_required
-    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
+    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER])
     def get(self, round_id):
         """Round for presenter"""
         r = Round.query.get(round_id)
@@ -582,7 +582,7 @@ class RoundAPIPresenterAdjudicators(Resource):
 
     @api.doc("round_presenter_adjudicators")
     @login_required
-    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
+    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER])
     def get(self, round_id):
         """Adjudicator data for presenter"""
         r = Round.query.get(round_id)
@@ -597,7 +597,7 @@ class RoundAPIPresenterStartingList(Resource):
 
     @api.doc("round_presenter_starting_list")
     @login_required
-    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
+    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER])
     def get(self, round_id):
         """Starting list data for presenter"""
         r = Round.query.get(round_id)
@@ -612,7 +612,7 @@ class RoundAPIPresenterCouplesPresent(Resource):
 
     @api.doc("round_presenter_couples_present")
     @login_required
-    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
+    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER])
     def get(self, round_id):
         """Floor manager data for presenter"""
         r = Round.query.get(round_id)
@@ -627,7 +627,7 @@ class RoundAPIPresenterNoReDanceCouples(Resource):
 
     @api.doc("round_presenter_no_re_dance_couples")
     @login_required
-    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
+    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER])
     def get(self, round_id):
         """No re-dance couples data for presenter"""
         r = Round.query.get(round_id)
@@ -642,7 +642,7 @@ class RoundAPIPresenterResults(Resource):
 
     @api.doc("round_presenter_results")
     @login_required
-    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
+    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER])
     def get(self, round_id):
         """Result data for presenter"""
         r = Round.query.get(round_id)

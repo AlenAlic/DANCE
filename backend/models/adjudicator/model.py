@@ -17,8 +17,6 @@ class Adjudicator(db.Model, TrackModifications):
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
     user = db.relationship("User", backref=db.backref("adjudicator", uselist=False), single_parent=True,
                            cascade="all, delete-orphan")
-    # Remove the cascade for xTDS
-    # user = db.relationship("User", backref=db.backref("adjudicator", uselist=False), single_parent=True)
     assignments = db.relationship("AdjudicatorCompetitionAssignment", back_populates="adjudicator")
 
     def __repr__(self):

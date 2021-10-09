@@ -41,9 +41,9 @@ export default {
       floorInterval: null
     };
   },
-  created() {
-    this.getData();
-  },
+  // created() {
+  //   this.getData();
+  // },
   methods: {
     emitRound(r) {
       this.$emit("updated", r);

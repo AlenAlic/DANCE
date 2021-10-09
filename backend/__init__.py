@@ -3,10 +3,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_admin import Admin
 from backend.admin import MyAdminIndexView, AdjudicatorSystemView, UserView
-from backend.models.user import Anonymous
 from config import Config
-from backend.constants import AL_TOURNAMENT_OFFICE_MANAGER, AL_FLOOR_MANAGER, AL_PRESENTER
-from datetime import datetime
 
 
 migrate = Migrate()
@@ -15,6 +12,9 @@ admin = Admin(template_mode="bootstrap3", index_view=MyAdminIndexView())
 
 
 def create_app(config_class=Config):
+    from backend.models.user import Anonymous
+    from datetime import datetime
+    from backend.constants import AL_TOURNAMENT_OFFICE_MANAGER, AL_FLOOR_MANAGER, AL_PRESENTER
     from backend.models import User, Event, Competition, DancingClass, Discipline, Dance, Round, \
         Heat, Couple, Adjudicator, Mark, CouplePresent, RoundResult, FinalPlacing, DanceActive, CompetitionMode, \
         Dancer, AdjudicatorCompetitionAssignment, EventResult

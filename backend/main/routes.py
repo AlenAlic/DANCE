@@ -4,7 +4,7 @@ from backend.main import bp
 from backend.main.forms import LoginForm
 from backend.models import User
 from backend.models.user.util import decode_token
-from backend.constants import GET, POST
+from backend.constants import GET, POST, OK
 import os
 
 
@@ -56,3 +56,8 @@ def dashboard():
 def logout():
     logout_user()
     return redirect(url_for("main.index"))
+
+
+@bp.route('/ping', methods=[GET])
+def ping():
+    return OK

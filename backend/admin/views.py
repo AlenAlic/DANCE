@@ -9,7 +9,7 @@ class MyAdminIndexView(AdminIndexView):
     @expose("/")
     def index(self):
         if not current_user.is_authenticated:
-            return redirect(url_for("flask_app.index"))
+            return redirect(url_for("main.index"))
         else:
             return self.render(self._template)
 
