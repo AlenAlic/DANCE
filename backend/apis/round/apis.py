@@ -11,7 +11,7 @@ from backend.models.couple import Couple
 from backend.models.heat import Heat
 from backend.models.round_result import RoundResult
 from backend.models.couple.functions import generate_new_couples_from_dancers
-from backend.constants import AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER
+from backend.constants import AL_TOURNAMENT_OFFICE_MANAGER, AL_PRESENTER, AL_FLOOR_MANAGER
 from backend.models.user.wrappers import login_required, requires_access_level
 
 
@@ -322,7 +322,7 @@ class RoundAPIFloorManagementDance(Resource):
 
     @api.doc("get_floor_management_dance")
     @login_required
-    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER])
+    @requires_access_level([AL_TOURNAMENT_OFFICE_MANAGER, AL_FLOOR_MANAGER])
     def get(self, round_id, dance_id):
         """Get floor management data for a specific dance"""
         r = Round.query.get(round_id)
