@@ -61,6 +61,7 @@ class Couple(db.Model, TrackModifications):
             "couple_id": self.couple_id,
             "name": self.names(),
             "number": self.number,
+            "team": self.team(),
         }
         return data
 
