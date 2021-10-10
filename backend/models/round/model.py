@@ -488,7 +488,7 @@ class Round(db.Model, TrackModifications):
         if self.competition.is_change_per_dance():
             random.shuffle(couples)
             for idx, dance in enumerate(self.dances):
-                couples = generate_new_couples_from_couples(couples, offset=idx)
+                couples = generate_new_couples_from_couples(couples, offset=1)
                 self.generate_final_placings(self.competition.adjudicators, couples, dance)
         else:
             if self.competition.is_change_per_round():
