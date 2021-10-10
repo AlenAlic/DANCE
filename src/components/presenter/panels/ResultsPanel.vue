@@ -34,9 +34,12 @@
                   <b class="mr-3">{{ result.couple.number }}</b>
                 </td>
                 <td v-if="round.mode === $constants.CHANGE_PER_DANCE">
-                  {{ result.couple.lead.name }}
+                  {{ result.couple.lead.name }} ({{ result.couple.lead.team }})
                 </td>
-                <td v-else>{{ result.couple.lead.name }}/{{ result.couple.follow.name }}</td>
+                <td v-else>
+                  {{ result.couple.lead.name }}/{{ result.couple.follow.name }}
+                  {{ getTeams(result) }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -84,7 +87,7 @@
                 <td class="text-right">
                   <b class="mr-3">{{ result.couple.follow.number }}</b>
                 </td>
-                <td>{{ result.couple.follow.name }}</td>
+                <td>{{ result.couple.follow.name }} ({{ result.couple.follow.team }})</td>
               </tr>
             </tbody>
           </table>
@@ -157,6 +160,13 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+    },
+    getTeams(result) {
+      if (result.couple.lead.team === result.couple.follow.team) {
+        return `(${result.couple.lead.team})`;
+      } else {
+        return `(${result.couple.lead.team}/${result.couple.follow.team})`;
+      }
     }
   }
 };
