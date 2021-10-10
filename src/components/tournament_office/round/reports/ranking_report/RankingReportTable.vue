@@ -110,6 +110,17 @@
                   {{ data.results[rank.number][r][d.dance_id].sum }}
                 </td>
               </template>
+              <template v-else>
+                <td
+                  v-for="a in data.adjudicators"
+                  :key="`${rank.number}-${r}-${d.dance_id}-${a.adjudicator_id}`"
+                  :class="{
+                    hidden: !dancesExpanded[d.dance_id],
+                    adjudicator: dancesExpanded[d.dance_id]
+                  }"
+                />
+                <td :key="`${rank.number}-${r}-${d.dance_id}-sum`" class="sum highlighted-col" />
+              </template>
             </template>
             <td :key="`${rank.number}-${r}-total`" class="total total-col">
               {{ data.results[rank.number][r].total }}
