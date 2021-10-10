@@ -554,6 +554,8 @@ class RoundAPIAdjudicationEvaluateRound(Resource):
         """Evaluate the result of a round"""
         r = Round.query.get(round_id)
         if r is not None:
+            r.is_active = False;
+            db.session.commit()
             if r.can_evaluate():
                 r.evaluate()
                 return OK
