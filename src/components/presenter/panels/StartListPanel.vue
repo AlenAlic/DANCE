@@ -15,7 +15,7 @@
             <td class="text-right">
               <b class="mr-3">{{ couple.number }}</b>
             </td>
-            <td>{{ couple.name }}</td>
+            <td>{{ couple.name }} ({{ couple.team }})</td>
           </tr>
         </tbody>
         <tbody v-else>
@@ -28,7 +28,7 @@
             <td class="text-right">
               <b class="mr-3">{{ dancer.number }}</b>
             </td>
-            <td>{{ dancer.name }}</td>
+            <td>{{ dancer.name }} ({{ dancer.team }})</td>
           </tr>
           <tr>
             <td colspan="2" class="pt-5">
@@ -39,7 +39,7 @@
             <td class="text-right">
               <b class="mr-3">{{ dancer.number }}</b>
             </td>
-            <td>{{ dancer.name }}</td>
+            <td>{{ dancer.name }} ({{ dancer.team }})</td>
           </tr>
         </tbody>
       </table>
