@@ -21,7 +21,8 @@ class CouplePresent(db.Model, TrackModifications):
             "name": self.couple_name(),
             "present": self.present,
             "heat": self.heat.number,
-            "floor": self.heat.floor
+            "floor": self.heat.floor,
+            "couple_id": self.couple_id,
         }
         return data
 
