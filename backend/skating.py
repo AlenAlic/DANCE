@@ -183,6 +183,9 @@ class Rule11(SkatingDance):
         majority_couples = [couple for couple in couples if self.skating.loc[couple, RESULT] == 0]
         majority_couples = [couple for couple in majority_couples if self.skating.loc[couple, col] >= self.majority
                             and self.skating.loc[couple, RESULT] == 0]
+        if len(majority_couples) == 0:
+            if col + 1 in self.placing_columns:
+                self.rule_5(col+1, couples)
         if placings is None:
             obtained_placings = [n for n in self.skating[RESULT].values if n > 0]
             placings = list(range(len(obtained_placings) + 1, len(obtained_placings) + 1 + len(majority_couples)))
@@ -199,9 +202,6 @@ class Rule11(SkatingDance):
                 self.rule_5(col, couples)
         elif len(majority_couples) > 1:
             self.rule_6(col, majority_couples, placings)
-        elif len(majority_couples) == 0:
-            if col + 1 in self.placing_columns:
-                self.rule_5(col+1, couples, placings)
 
     def populate(self, place, couples):
         if self.follows:
