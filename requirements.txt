@@ -18,7 +18,7 @@ MarkupSafe==1.1.1
 more-itertools==8.1.0
 numpy==1.18.1
 pandas==0.25.3
-PyJWT==1.7.1
+PyJWT==2.4.0
 PyMySQL==0.9.3
 pyrsistent==0.15.7
 python-dateutil==2.8.1
